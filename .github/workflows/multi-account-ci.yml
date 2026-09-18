@@ -58,7 +58,7 @@ jobs:
           path: |
             ~/Library/Developer/Xcode/DerivedData
             ~/Library/Caches/org.swift.swiftpm
-          key: ma-xcode-build-cache-${{ github.ref_name }}-${{ github.sha }}
+          key: ma2-xcode-build-cache-${{ github.ref_name }}-${{ github.sha }}
 
       - name: Restore Cache (last)
         if: steps.xcode-cache-exact.outputs.cache-hit != 'true'
@@ -67,11 +67,15 @@ jobs:
           path: |
             ~/Library/Developer/Xcode/DerivedData
             ~/Library/Caches/org.swift.swiftpm
-          key: ma-xcode-build-cache-${{ github.ref_name }}-
+          key: ma2-xcode-build-cache-${{ github.ref_name }}-
 
       - name: Build
         run: |
           mkdir -p build/logs
+          # A SwiftPM artifact cache restored from another branch/dependency set makes package
+          # resolution fail with "<binary target> ... already exists in file system" (as upstream's
+          # scripts/ci/workflow.py clean_spm_cache() also does, drop it and re-resolve).
+          rm -rf ~/Library/Caches/org.swift.swiftpm/*
           set -o pipefail && NSUnbufferedIO=YES make -B build \
             2>&1 | tee build/logs/build.log | xcbeautify --renderer github-actions
 
@@ -94,7 +98,7 @@ jobs:
           path: |
             ~/Library/Developer/Xcode/DerivedData
             ~/Library/Caches/org.swift.swiftpm
-          key: ma-xcode-build-cache-${{ github.ref_name }}-${{ github.sha }}
+          key: ma2-xcode-build-cache-${{ github.ref_name }}-${{ github.sha }}
 
       - name: Upload build log
         if: always()
