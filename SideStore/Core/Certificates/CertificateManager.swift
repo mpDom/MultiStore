@@ -328,7 +328,9 @@ public final class CertificateManager: @unchecked Sendable {
             return nil
         }
         
-        let certChain = parser.x509Certificates()
+        // Annotated: newer CodeSignKit also defines MachOParser.x509Certificates() -> [X509Certificate];
+        // this code works with AltSign's ALTX509Certificate variant.
+        let certChain: [ALTX509Certificate] = parser.x509Certificates()
 
         debugLog("[CertificateManager] readBinaryCertificate: Found \(certChain.count) certificate(s) in Mach-O chain.")
         

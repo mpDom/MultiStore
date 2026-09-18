@@ -36,15 +36,15 @@ public struct ODAInfo: Codable, Equatable, Sendable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.sha256 = (try? container.decodeIfPresent(String.self, forKey: .sha256))
-            ?? (try? container.decodeIfPresent(String.self, forKey: .sha))
-            ?? (try? container.decodeIfPresent(String.self, forKey: .s))
+        // Decoded key by key: a single chained `try? ... ?? try? ...` expression makes the Swift
+        // type checker give up ("unable to type-check this expression in reasonable time").
+        func decode(_ key: CodingKeys) -> String? {
+            (try? container.decodeIfPresent(String.self, forKey: key)) ?? nil
+        }
+        self.sha256 = decode(.sha256) ?? decode(.sha) ?? decode(.s)
 
-        let lVal = (try? container.decodeIfPresent(String.self, forKey: .l))
-            ?? (try? container.decodeIfPresent(String.self, forKey: .libraries))
-            ?? (try? container.decodeIfPresent(String.self, forKey: .payload))
-            ?? (try? container.decodeIfPresent(String.self, forKey: .data))
-        let urlVal = try? container.decodeIfPresent(String.self, forKey: .url)
+        let lVal: String? = decode(.l) ?? decode(.libraries) ?? decode(.payload) ?? decode(.data)
+        let urlVal: String? = decode(.url)
 
         if let raw = lVal ?? urlVal {
             if raw.hasPrefix("http://") || raw.hasPrefix("https://") {
