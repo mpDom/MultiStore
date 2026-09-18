@@ -5,8 +5,8 @@
     branch = develop
 [submodule "Dependencies/em_proxy"]
 	path = Dependencies/em_proxy
-	url = https://github.com/SideStore/em_proxy
-    branch = develop
+	url = https://github.com/mpDom/em_proxy
+	branch = multistore-prebuilt-fix
 
 [submodule "Dependencies/AltSign"]
     path = Dependencies/AltSign
