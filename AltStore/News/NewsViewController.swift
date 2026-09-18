@@ -6,11 +6,9 @@
 //  Copyright © 2019 Riley Testut. All rights reserved.
 //
 
-import UIKit
-import SafariServices
+@preconcurrency import UIKit
 import Combine
 import CoreData
-import AltStoreCore
 
 import Nuke
 
@@ -41,7 +39,7 @@ private final class AppBannerFooterView: UICollectionReusableView
     }
 }
 
-class NewsViewController: UICollectionViewController, PeekPopPreviewing
+class NewsViewController: UICollectionViewController
 {
     // Nil == Show news from all sources.
     var source: Source?
@@ -103,11 +101,13 @@ class NewsViewController: UICollectionViewController, PeekPopPreviewing
         self.collectionView.register(NewsCollectionViewCell.nib, forCellWithReuseIdentifier: RSTCellContentGenericCellIdentifier)
         self.collectionView.register(AppBannerFooterView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: "AppBanner")
         
-        (self as PeekPopPreviewing).registerForPreviewing(with: self, sourceView: self.collectionView)
+        #if !os(tvOS)
+        self.registerForPreviewing(with: self, sourceView: self.collectionView)
         
         let refreshControl = UIRefreshControl(frame: .zero)
         refreshControl.addTarget(self, action: #selector(NewsViewController.updateSources), for: .primaryActionTriggered)
         self.collectionView.refreshControl = refreshControl
+        #endif
         
         self.retryButton = UIButton(type: .system)
         self.retryButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
@@ -120,6 +120,7 @@ class NewsViewController: UICollectionViewController, PeekPopPreviewing
             let tintColor = source.effectiveTintColor ?? .altPrimary
             self.view.tintColor = tintColor
             
+            #if !os(tvOS)
             let appearance = NavigationBarAppearance()
             appearance.configureWithTintColor(tintColor)
             appearance.configureWithDefaultBackground()
@@ -129,6 +130,7 @@ class NewsViewController: UICollectionViewController, PeekPopPreviewing
             
             self.navigationItem.standardAppearance = appearance
             self.navigationItem.scrollEdgeAppearance = edgeAppearance
+            #endif
         }
         
         self.preparePipeline()
@@ -209,10 +211,8 @@ private extension NewsViewController
         dataSource.prefetchHandler = { (newsItem, indexPath, completionHandler) in
             guard let imageURL = newsItem.imageURL else { return nil }
             
-            return RSTAsyncBlockOperation() { (operation) in
+            Task.detached(priority: .background) {
                 ImagePipeline.shared.loadImage(with: imageURL, progress: nil) { result in
-                    guard !operation.isCancelled else { return operation.finish() }
-                    
                     switch result
                     {
                     case .success(let response): completionHandler(response.image, nil)
@@ -220,6 +220,7 @@ private extension NewsViewController
                     }
                 }
             }
+            return nil
         }
         dataSource.prefetchCompletionHandler = { (cell, image, indexPath, error) in
             let cell = cell as! NewsCollectionViewCell
@@ -240,7 +241,9 @@ private extension NewsViewController
     @objc func updateSources()
     {
         AppManager.shared.updateAllSources() { result in
+            #if !os(tvOS)
             self.collectionView.refreshControl?.endRefreshing()
+            #endif
             
             guard case .failure(let error) = result else { return }
             
@@ -341,7 +344,6 @@ private extension NewsViewController
         }
         
         Task(priority: .userInitiated) { @MainActor in
-            // if let installedApp = storeApp.installedApp, installedApp.isUpdateAvailable
             if let installedApp = storeApp.installedApp, installedApp.hasUpdate
             {
                 let progress = AppManager.shared.update(installedApp, presentingViewController: self, completionHandler: finish(_:))
@@ -349,18 +351,21 @@ private extension NewsViewController
             }
             else
             {
-                let group = await AppManager.shared.installAsync(storeApp, presentingViewController: self, completionHandler: finish(_:))
+                let group = await AppManager.shared.installAsync(
+                    storeApp,
+                    presentingViewController: self,
+                    completionHandler: finish(_:)
+                )
                 progressUpdateHandler(group.progress)
             }
         }
         
-        @MainActor
-        func finish(_ result: Result<InstalledApp, Error>)
+        nonisolated func finish(_ result: Result<InstalledApp, Error>) -> Void
         {
             DispatchQueue.main.async {
                 switch result
                 {
-                case .failure(OperationError.cancelled): break // Ignore
+                case .failure(let error) where error is CancellationError: break // Ignore
                 case .failure(let error):
                     let toastView = ToastView(error: error)
                     toastView.opensErrorLog = true
@@ -398,9 +403,7 @@ extension NewsViewController
         
         if let externalURL = newsItem.externalURL
         {
-            let safariViewController = SFSafariViewController(url: externalURL)
-            safariViewController.preferredControlTintColor = newsItem.tintColor
-            self.present(safariViewController, animated: true, completion: nil)
+            self.openWebURL(externalURL, preferredTintColor: newsItem.tintColor)
         }
         else if let storeApp = newsItem.storeApp
         {
@@ -488,6 +491,7 @@ extension NewsViewController: UICollectionViewDelegateFlowLayout
     }
 }
 
+#if !os(tvOS)
 extension NewsViewController: UIViewControllerPreviewingDelegate
 {
     @available(iOS, deprecated: 13.0)
@@ -503,9 +507,7 @@ extension NewsViewController: UIViewControllerPreviewingDelegate
             
             if let externalURL = newsItem.externalURL
             {
-                let safariViewController = SFSafariViewController(url: externalURL)
-                safariViewController.preferredControlTintColor = newsItem.tintColor
-                return safariViewController
+                return self.makeWebViewController(for: externalURL, preferredTintColor: newsItem.tintColor)
             }
             else if let storeApp = newsItem.storeApp
             {
@@ -540,13 +542,14 @@ extension NewsViewController: UIViewControllerPreviewingDelegate
     @available(iOS, deprecated: 13.0)
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController)
     {
-        if let safariViewController = viewControllerToCommit as? SFSafariViewController
-        {
-            self.present(safariViewController, animated: true, completion: nil)
-        }
-        else
+        if viewControllerToCommit is AppViewController
         {
             self.navigationController?.pushViewController(viewControllerToCommit, animated: true)
         }
+        else
+        {
+            self.present(viewControllerToCommit, animated: true, completion: nil)
+        }
     }
 }
+#endif

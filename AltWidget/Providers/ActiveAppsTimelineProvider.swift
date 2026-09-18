@@ -26,14 +26,17 @@ class ActiveAppsTimelineProvider<T:  WidgetInfo>: AppsTimelineProviderBase<Widge
     
     init(widgetKind: String){
         self.widgetKind = widgetKind
+        debugLog("[ActiveAppsTimelineProvider] Initialized for widgetKind: \(widgetKind)")
     }
     
     deinit{
+        debugLog("[ActiveAppsTimelineProvider] Deinit for widgetKind: \(widgetKind)")
         // if this provider goes out of scope, clear all entries
         PageInfoManager.shared.clearAll()
     }
     
     override func getUpdatedData(_ apps: [AppSnapshot], _ context: WidgetInfo?) -> [AppSnapshot] {
+        verboseLog("[ActiveAppsTimelineProvider] getUpdatedData called with \(apps.count) app(s), widgetID: \(String(describing: context?.ID))")
         var apps = apps
         
         // if simulator, get the 10 simulated entries based on first entry
@@ -74,6 +77,7 @@ class ActiveAppsTimelineProvider<T:  WidgetInfo>: AppsTimelineProviderBase<Widge
             updatePageInfo(widgetID: widgetID, navEvent: navEvent)
         }
              
+        verboseLog("[ActiveAppsTimelineProvider] getUpdatedData returning \(currentPageApps.count) page app(s)")
         return currentPageApps
     }
     
@@ -94,6 +98,7 @@ extension ActiveAppsTimelineProvider: AppIntentTimelineProvider {
     typealias Intent = WidgetUpdateIntent
 
     func snapshot(for intent: Intent, in context: Context) async -> AppsEntry<WidgetInfo> {
+        debugLog("[ActiveAppsTimelineProvider] AppIntent snapshot for intent ID: \(String(describing: intent.ID)) (context.isPreview: \(context.isPreview))")
         // system retains the previously configured ID value and posts the same here
         let widgetData = WidgetData(ID: intent.ID)
         
@@ -104,6 +109,7 @@ extension ActiveAppsTimelineProvider: AppIntentTimelineProvider {
     }
     
     func timeline(for intent: Intent, in context: Context) async -> Timeline<AppsEntry<WidgetInfo>> {
+        debugLog("[ActiveAppsTimelineProvider] AppIntent timeline for intent ID: \(String(describing: intent.ID)) (context.isPreview: \(context.isPreview))")
         // system retains the previously configured ID value and posts the same here
         let widgetData = WidgetData(ID: intent.ID)
 

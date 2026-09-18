@@ -9,14 +9,13 @@
 import Foundation
 
 #if canImport(UIKit)
-import UIKit
+@preconcurrency import UIKit
 public typealias ALTFont = UIFont
 #elseif canImport(AppKit)
 import AppKit
 public typealias ALTFont = NSFont
 #endif
 
-import AltSign
 
 public extension NSError
 {
@@ -38,7 +37,6 @@ public extension NSError
         return localizedTitle
     }
 
-    @objc(alt_errorWithLocalizedFailure:)
     func withLocalizedFailure(_ failure: String) -> NSError
     {
         switch self
@@ -56,7 +54,6 @@ public extension NSError
         }
     }
 
-    @objc(alt_errorWithLocalizedTitle:)
     func withLocalizedTitle(_ title: String) -> NSError
     {
         switch self
@@ -108,7 +105,7 @@ public extension NSError
             userInfo[NSUnderlyingErrorKey] = sanitizedError
         }
         
-        if #available(iOS 14.5, macOS 11.3, *), let underlyingErrors = userInfo[NSMultipleUnderlyingErrorsKey] as? [Error]
+        if let underlyingErrors = userInfo[NSMultipleUnderlyingErrorsKey] as? [Error]
         {
             let sanitizedErrors = underlyingErrors.map { ($0 as NSError).sanitizedForSerialization() }
             userInfo[NSMultipleUnderlyingErrorsKey] = sanitizedErrors
@@ -121,14 +118,15 @@ public extension NSError
     func formattedDetailedDescription(with font: ALTFont) -> NSAttributedString
     {
         #if canImport(UIKit)
-        let boldFontDescriptor = font.fontDescriptor.withSymbolicTraits(.traitBold) ?? font.fontDescriptor
-        let boldFont = ALTFont(descriptor: boldFontDescriptor, size: font.pointSize)
+        let headerFont = UIFont.preferredFont(forTextStyle: .headline)
+        let valueFont = UIFont.preferredFont(forTextStyle: .subheadline)
         #else
         let boldFontDescriptor = font.fontDescriptor.withSymbolicTraits(.bold)
-        let boldFont = ALTFont(descriptor: boldFontDescriptor, size: font.pointSize) ?? font
+        let headerFont = ALTFont(descriptor: boldFontDescriptor, size: font.pointSize + 2.0) ?? font
+        let valueFont = font.withSize(max(font.pointSize - 2.0, 11.0))
         #endif
 
-        var preferredKeyOrder: [String] = [
+        let preferredKeyOrder: [String] = [
             NSDebugDescriptionErrorKey,
             NSLocalizedDescriptionKey,
             NSLocalizedFailureErrorKey,
@@ -137,13 +135,9 @@ public extension NSError
             ALTLocalizedTitleErrorKey as String,
             ALTSourceFileErrorKey as String,
             ALTSourceLineErrorKey as String,
-            NSUnderlyingErrorKey
+            NSUnderlyingErrorKey,
+            NSMultipleUnderlyingErrorsKey
         ]
-
-        if #available(iOS 14.5, macOS 11.3, *)
-        {
-            preferredKeyOrder.append(NSMultipleUnderlyingErrorsKey)
-        }
 
         var userInfo = self.userInfo
         userInfo[NSDebugDescriptionErrorKey] = self.localizedDebugDescription
@@ -153,8 +147,8 @@ public extension NSError
         userInfo[NSLocalizedRecoverySuggestionErrorKey] = self.localizedRecoverySuggestion
 
         let sortedUserInfo = userInfo.sorted { (a, b) in
-            let indexA = preferredKeyOrder.firstIndex(of: a.key as? String ?? "")
-            let indexB = preferredKeyOrder.firstIndex(of: b.key as? String ?? "")
+            let indexA = preferredKeyOrder.firstIndex(of: a.key)
+            let indexB = preferredKeyOrder.firstIndex(of: b.key)
 
             switch (indexA, indexB)
             {
@@ -181,19 +175,12 @@ public extension NSError
             case _ where key == ALTSourceFileErrorKey as String: keyName = NSLocalizedString("Source File", comment: "")
             case _ where key == ALTSourceLineErrorKey as String: keyName = NSLocalizedString("Source Line", comment: "")
             case NSUnderlyingErrorKey: keyName = NSLocalizedString("Underlying Error", comment: "")
-            default:
-                if #available(iOS 14.5, macOS 11.3, *), key == NSMultipleUnderlyingErrorsKey
-                {
-                    keyName = NSLocalizedString("Underlying Errors", comment: "")
-                }
-                else
-                {
-                    keyName = key
-                }
+            case NSMultipleUnderlyingErrorsKey: keyName = NSLocalizedString("Underlying Errors", comment: "")
+            default: keyName = key
             }
 
-            let attributedKey = NSAttributedString(string: keyName, attributes: [.font: boldFont])
-            let attributedValue = NSAttributedString(string: String(describing: value), attributes: [.font: font])
+            let attributedKey = NSAttributedString(string: keyName, attributes: [.font: headerFont])
+            let attributedValue = NSAttributedString(string: String(describing: value), attributes: [.font: valueFont])
 
             let attributedString = NSMutableAttributedString(attributedString: attributedKey)
             attributedString.mutableString.append("\n")
@@ -209,10 +196,7 @@ public extension NSError
 
         // Support dark mode
 		#if canImport(UIKit)
-        if #available(iOS 13, *)
-        {
-            detailedDescription.addAttribute(.foregroundColor, value: UIColor.label, range: NSMakeRange(0, detailedDescription.length))
-        }
+        detailedDescription.addAttribute(.foregroundColor, value: UIColor.label, range: NSMakeRange(0, detailedDescription.length))
 		#else
         detailedDescription.addAttribute(.foregroundColor, value: NSColor.labelColor, range: NSMakeRange(0, detailedDescription.length))
 		#endif

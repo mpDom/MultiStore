@@ -6,7 +6,7 @@
 //  Copyright © 2019 Riley Testut. All rights reserved.
 //
 
-import UIKit
+@preconcurrency import UIKit
 
 
 class NavigationBarAppearance: UINavigationBarAppearance
@@ -43,6 +43,7 @@ class NavigationBar: UINavigationBar
     
     private func initialize()
     {
+        #if !os(tvOS)
         let standardAppearance = UINavigationBarAppearance()
         standardAppearance.configureWithDefaultBackground()
         standardAppearance.shadowColor = nil
@@ -70,6 +71,12 @@ class NavigationBar: UINavigationBar
         
         self.scrollEdgeAppearance = edgeAppearance
         self.standardAppearance = standardAppearance
+        #else
+        if let tintColor = self.barTintColor {
+            self.barTintColor = tintColor
+            self.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+        }
+        #endif
     }
     
     override func layoutSubviews()
@@ -89,11 +96,13 @@ class NavigationBar: UINavigationBar
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView?
     {
+        #if !os(tvOS)
         if let appearance = self.topItem?.standardAppearance as? NavigationBarAppearance, appearance.ignoresUserInteraction
         {
             // Ignore touches.
             return nil
         }
+        #endif
         
         return super.hitTest(point, with: event)
     }

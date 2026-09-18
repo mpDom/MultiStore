@@ -6,8 +6,7 @@
 //  Copyright © 2019 Riley Testut. All rights reserved.
 //
 
-import UIKit
-import AltStoreCore
+@preconcurrency import UIKit
 
 extension TabBarController
 {
@@ -35,13 +34,13 @@ final class TabBarController: UITabBarController
         
         NotificationCenter.default.addObserver(self, selector: #selector(TabBarController.importApp(_:)), name: AppDelegate.importAppDeepLinkNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(TabBarController.presentSources(_:)), name: AppDelegate.addSourceDeepLinkNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(TabBarController.exportFiles(_:)), name: AppDelegate.exportCertificateNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(TabBarController.openErrorLog(_:)), name: ToastView.openErrorLogNotification, object: nil)
     }
     
     override func viewDidLoad() 
     {
         super.viewDidLoad()
+        debugLog("[TabBarController] viewDidLoad()")
         
         let browseNavigationController = self.viewControllers![Tab.browse.rawValue] as! UINavigationController
         browseNavigationController.tabBarItem.image = UIImage(systemName: "bag")
@@ -53,6 +52,7 @@ final class TabBarController: UITabBarController
     override func viewDidAppear(_ animated: Bool)
     {
         super.viewDidAppear(animated)
+        debugLog("[TabBarController] viewDidAppear() — TabBarController is now visible")
         
         _viewDidAppear = true
         
@@ -104,11 +104,6 @@ private extension TabBarController
     }
 
     @objc func openErrorLog(_ notification: Notification)
-    {
-        self.selectedIndex = Tab.settings.rawValue
-    }
-    
-    @objc func exportFiles(_ notification: Notification)
     {
         self.selectedIndex = Tab.settings.rawValue
     }

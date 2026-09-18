@@ -1,6 +1,6 @@
 //
 //  NSError+ALTServerError.swift
-//  AltStoreCore
+//  AltStore
 //
 //  Created by Magesh K on 2026-06-28.
 //

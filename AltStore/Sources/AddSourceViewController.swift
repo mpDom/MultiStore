@@ -6,10 +6,9 @@
 //  Copyright © 2023 Riley Testut. All rights reserved.
 //
 
-import UIKit
+@preconcurrency import UIKit
 import CoreData
 import Combine
-import AltStoreCore
 
 import Nuke
 
@@ -141,7 +140,9 @@ private extension AddSourceViewController
                 
             case .preview:
                 var configuration = UICollectionLayoutListConfiguration(appearance: .grouped)
+                #if !os(tvOS)
                 configuration.showsSeparators = false
+                #endif
                 configuration.backgroundColor = .clear
                 
                 if !self.viewModel.sourceURLs.isEmpty && self.viewModel.isShowingPreviewStatus
@@ -169,7 +170,9 @@ private extension AddSourceViewController
                 
             case .recommended:
                 var configuration = UICollectionLayoutListConfiguration(appearance: .grouped)
+                #if !os(tvOS)
                 configuration.showsSeparators = false
+                #endif
                 configuration.backgroundColor = .clear
                 
                 switch self.fetchRecommendedSourcesResult
@@ -241,10 +244,8 @@ private extension AddSourceViewController
         dataSource.prefetchHandler = { (source, indexPath, completionHandler) in
             guard let imageURL = source.effectiveIconURL else { return nil }
             
-            return RSTAsyncBlockOperation() { (operation) in
+            Task.detached(priority: .background) {
                 ImagePipeline.shared.loadImage(with: imageURL, progress: nil) { result in
-                    guard !operation.isCancelled else { return operation.finish() }
-                    
                     switch result
                     {
                     case .success(let response): completionHandler(response.image, nil)
@@ -252,6 +253,7 @@ private extension AddSourceViewController
                     }
                 }
             }
+            return nil
         }
         dataSource.prefetchCompletionHandler = { (cell, image, indexPath, error) in
             let cell = cell as! AppBannerCollectionViewCell
@@ -279,10 +281,8 @@ private extension AddSourceViewController
         dataSource.prefetchHandler = { (source, indexPath, completionHandler) in
             guard let imageURL = source.effectiveIconURL else { return nil }
             
-            return RSTAsyncBlockOperation() { (operation) in
+            Task.detached(priority: .background) {
                 ImagePipeline.shared.loadImage(with: imageURL, progress: nil) { result in
-                    guard !operation.isCancelled else { return operation.finish() }
-                    
                     switch result
                     {
                     case .success(let response): completionHandler(response.image, nil)
@@ -290,6 +290,7 @@ private extension AddSourceViewController
                     }
                 }
             }
+            return nil
         }
         dataSource.prefetchCompletionHandler = { (cell, image, indexPath, error) in
             let cell = cell as! AppBannerCollectionViewCell
@@ -508,7 +509,7 @@ private extension AddSourceViewController
         
         var fetchOperation: FetchSourceOperation?
         return Future<Source, Error> { promise in
-            fetchOperation = AppManager.shared.fetchSource(sourceURL: sourceURL, managedObjectContext: context) { result in
+            fetchOperation = try? AppManager.shared.fetchSource(sourceURL: sourceURL, managedObjectContext: context) { result in
                 promise(result)
             }
         }
@@ -597,7 +598,7 @@ private extension AddSourceViewController
         cell.bannerView.button.imageView?.contentMode = .scaleAspectFit
         cell.bannerView.button.contentHorizontalAlignment = .fill // Fill entire button with imageView
         cell.bannerView.button.contentVerticalAlignment = .fill
-        cell.bannerView.button.contentEdgeInsets = .zero
+        cell.bannerView.button.configuration = nil
         cell.bannerView.button.tintColor = .clear
         cell.bannerView.button.isHidden = false
         
@@ -612,7 +613,7 @@ private extension AddSourceViewController
                 var isSourceAlreadyPersisted = false
                 do
                 {
-                    isSourceAlreadyPersisted = try await source.isAdded
+                    isSourceAlreadyPersisted = try await source.isAdded()
                 }
                 catch
                 {
@@ -697,6 +698,7 @@ private extension AddSourceViewController
     
     func fetchRecommendedSources()
     {
+        debugLog("[AddSourceViewController] Fetching recommended sources started (spinner shown)...")
         // Closure instead of local function so we can capture `self` weakly.
         let finish: (Result<[Source], Error>) -> Void = { [weak self] result in
             self?.fetchRecommendedSourcesResult = result.map { _ in () }
@@ -705,14 +707,14 @@ private extension AddSourceViewController
                 do
                 {
                     let sources = try result.get()
-                    debugLog("Fetched recommended sources: \(sources.map { $0.identifier })")
+                    debugLog("[AddSourceViewController] Recommended sources spinner stopped. Loaded \(sources.count) source(s) into list: \(sources.map { $0.name })")
                     
                     let sectionUpdate = RSTCellContentChange(type: .update, sectionIndex: 0)
                     self?.recommendedSourcesDataSource.setItems(sources, with: [sectionUpdate])
                 }
                 catch
                 {
-                    debugLog("Error fetching recommended sources: \(error)")
+                    debugLog("[AddSourceViewController] Recommended sources spinner stopped (failed: \(error.localizedDescription))")
                     
                     let sectionUpdate = RSTCellContentChange(type: .update, sectionIndex: 0)
                     self?.recommendedSourcesDataSource.setItems([], with: [sectionUpdate])
@@ -724,10 +726,10 @@ private extension AddSourceViewController
             switch result
             {
             case .failure(let error): finish(.failure(error))
-            case .success((let trustedSources, _)):
+            case .success((let defaultSources, _)):
                 
                 // Don't show sources without a sourceURL.
-                let featuredSourceURLs = trustedSources.compactMap { $0.sourceURL }
+                let featuredSourceURLs = defaultSources.compactMap { $0.sourceURL }
                 
                 // This context is never saved, but keeps the managed sources alive.
                 let context = DatabaseManager.shared.persistentContainer.newBackgroundSavingViewContext()
@@ -742,20 +744,28 @@ private extension AddSourceViewController
                 {
                     dispatchGroup.enter()
                     
-                    AppManager.shared.fetchSource(sourceURL: sourceURL, managedObjectContext: context) { result in
-                        // Serialize access to sourcesByURL.
-                        context.performAndWait {
-                            switch result
-                            {
-                            case .failure(let error):
-                                debugLog("Failed to load recommended source \(sourceURL.absoluteString): \(error.localizedDescription) \(error)")
-                                fetchError = error
+                    do
+                    {
+                        _ = try AppManager.shared.fetchSource(sourceURL: sourceURL, managedObjectContext: context) { result in
+                            // Serialize access to sourcesByURL.
+                            context.performAndWait {
+                                switch result
+                                {
+                                case .failure(let error):
+                                    debugLog("Failed to load recommended source \(sourceURL.absoluteString): \(error.localizedDescription) \(error)")
+                                    
+                                case .success(let source):
+                                    sourcesByURL[source.sourceURL] = source
+                                }
                                 
-                            case .success(let source): sourcesByURL[source.sourceURL] = source
+                                dispatchGroup.leave()
                             }
-                            
-                            dispatchGroup.leave()
                         }
+                    }
+                    catch
+                    {
+                        debugLog("Failed to start loading recommended source \(sourceURL.absoluteString): \(error.localizedDescription)")
+                        dispatchGroup.leave()
                     }
                 }
                 
@@ -791,6 +801,14 @@ private extension AddSourceViewController
         }
         
         Task {
+            for result in self.viewModel.sourcePreviewResults {
+                if case .failure(let error) = result.result {
+                    let errorTitle = NSLocalizedString("Unable to Add Source", comment: "")
+                    await self.presentAlert(title: errorTitle, message: error.localizedDescription)
+                    return
+                }
+            }
+            
             var isCancelled = false
             // OK: COMMIT the staged changes now
             // Convert the stagedForAdd dictionary into an array of StagedSource
@@ -963,12 +981,3 @@ extension AddSourceViewController: UITextFieldDelegate
     }
 }
 
-@available(iOS 17.0, *)
-#Preview(traits: .portrait) {
-    DatabaseManager.shared.startForPreview()
-    
-    let storyboard = UIStoryboard(name: "Sources", bundle: .main)
-    
-    let addSourceNavigationController = storyboard.instantiateViewController(withIdentifier: "addSourceNavigationController")
-    return addSourceNavigationController
-}

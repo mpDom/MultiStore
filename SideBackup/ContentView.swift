@@ -17,15 +17,43 @@ struct ContentView: View {
                 .ignoresSafeArea()
             
             VStack(spacing: 22) {
-                if let operation = state.currentOperation {
+                if let error = state.bootCheckError {
+                    // Hard boot failure — App Group not accessible
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 44))
+                        .foregroundColor(.orange)
+                    
+                    Text(NSLocalizedString("SideBackup could not start", comment: ""))
+                        .font(.title2.bold())
+                        .foregroundColor(Color("Text"))
+                        .multilineTextAlignment(.center)
+                    
+                    Text(error.localizedDescription)
+                        .font(.callout)
+                        .foregroundColor(Color("Text").opacity(0.75))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 8)
+                    
+                } else if let operation = state.currentOperation {
                     Text(operation == .backup ? "Backing up app data…" : "Restoring app data…")
                         .font(.title2)
                         .foregroundColor(Color("Text"))
                         .multilineTextAlignment(.center)
                     
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color("Text")))
-                        .scaleEffect(1.5)
+                    VStack(spacing: 10) {
+                        ProgressView(value: state.progressFraction)
+                            .progressViewStyle(LinearProgressViewStyle(tint: Color("Text")))
+                            .frame(height: 8)
+                            .clipShape(Capsule())
+                        
+                        if !state.progressText.isEmpty {
+                            Text(state.progressText)
+                                .font(.callout.monospacedDigit())
+                                .foregroundColor(Color("Text").opacity(0.85))
+                                .multilineTextAlignment(.center)
+                        }
+                    }
+                    .padding(.horizontal, 16)
                 } else {
                     Text(String(format: NSLocalizedString("%@ is inactive.", comment: ""),
                                 Bundle.main.appName ?? NSLocalizedString("App", comment: "")))
@@ -45,3 +73,4 @@ struct ContentView: View {
         .preferredColorScheme(.dark)
     }
 }
+

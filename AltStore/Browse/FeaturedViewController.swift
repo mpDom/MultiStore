@@ -6,11 +6,9 @@
 //  Copyright © 2023 Riley Testut. All rights reserved.
 //
 
-import UIKit
+@preconcurrency import UIKit
 import CoreData
-import AltStoreCore
-
-import Nuke
+@preconcurrency import Nuke
 
 extension UIAction.Identifier
 {
@@ -105,10 +103,12 @@ class FeaturedViewController: UICollectionViewController
             return nil
         }
         
+        #if !os(tvOS)
         self.navigationItem.searchController = self.searchController
         self.navigationItem.hidesSearchBarWhenScrolling = true
         
         self.navigationItem.largeTitleDisplayMode = .always
+        #endif
     }
     
     override func viewDidAppear(_ animated: Bool) 
@@ -188,7 +188,7 @@ private extension FeaturedViewController
                 return layoutSection
                 
             case _ where section.isFeaturedAppsSection:
-                let itemHeight: NSCollectionLayoutDimension = if #available(iOS 17, *) { .uniformAcrossSiblings(estimate: 350) } else { .estimated(350) }
+                let itemHeight: NSCollectionLayoutDimension = if #available(iOS 17, tvOS 17, *) { .uniformAcrossSiblings(estimate: 350) } else { .estimated(350) }
                 let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: itemHeight)
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 
@@ -196,9 +196,10 @@ private extension FeaturedViewController
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
                 group.interItemSpacing = .fixed(spacing)
                 
-                let titleHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: titleSize, elementKind: ElementKind.sourceHeader.rawValue, alignment: .topLeading)
+                let sourceHeaderSize = NSCollectionLayoutSize(widthDimension: .estimated(100), heightDimension: .absolute(30))
+                let titleHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: sourceHeaderSize, elementKind: ElementKind.sourceHeader.rawValue, alignment: .topLeading)
                 
-                let buttonSize = NSCollectionLayoutSize(widthDimension: .estimated(44), heightDimension: .estimated(20))
+                let buttonSize = NSCollectionLayoutSize(widthDimension: .estimated(70), heightDimension: .absolute(30))
                 let buttonHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: buttonSize, elementKind: ElementKind.button.rawValue, alignment: .topTrailing)
                 
                 let layoutSection = NSCollectionLayoutSection(group: group)
@@ -260,18 +261,22 @@ private extension FeaturedViewController
             cell.bannerView.iconImageView.image = nil
             cell.bannerView.iconImageView.isIndicatingActivity = true
         }
-        dataSource.prefetchHandler = { (storeApp, indexPath, completion) -> Foundation.Operation? in
-            return RSTAsyncBlockOperation { (operation) in
-                storeApp.managedObjectContext?.perform {
-                    ImagePipeline.shared.loadImage(with: storeApp.iconURL, progress: nil) { result in
-                        guard !operation.isCancelled else { return operation.finish() }
-                        
-                        switch result
-                        {
-                        case .success(let response): completion(response.image, nil)
-                        case .failure(let error): completion(nil, error)
-                        }
+        dataSource.prefetchHandler = { (storeApp, indexPath, completion) in
+            let iconURL = storeApp.iconURL
+            let imageTask = ImagePipeline.shared.loadImage(with: iconURL, progress: nil) { result in
+                switch result
+                {
+                case .success(let response): completion(response.image, nil)
+                case .failure(let error): completion(nil, error)
+                }
+            }
+            return Task {
+                await withTaskCancellationHandler {
+                    if Task.isCancelled {
+                        imageTask.cancel()
                     }
+                } onCancel: {
+                    imageTask.cancel()
                 }
             }
         }
@@ -399,18 +404,30 @@ private extension FeaturedViewController
             cell.bannerView.iconImageView.image = nil
             cell.bannerView.iconImageView.isIndicatingActivity = true
         }
-        dataSource.prefetchHandler = { (storeApp, indexPath, completion) -> Foundation.Operation? in
-            return RSTAsyncBlockOperation { (operation) in
-                storeApp.managedObjectContext?.perform {
-                    ImagePipeline.shared.loadImage(with: storeApp.iconURL, progress: nil) { result in
-                        guard !operation.isCancelled else { return operation.finish() }
-                        
-                        switch result
-                        {
-                        case .success(let response): completion(response.image, nil)
-                        case .failure(let error): completion(nil, error)
+        dataSource.prefetchHandler = { (storeApp, indexPath, completion) in
+            let iconURL = storeApp.iconURL
+            let imageTask = ImagePipeline.shared.loadImage(with: iconURL, progress: nil) { result in
+                switch result
+                {
+                case .success(let response):
+                    let image = response.image
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        _ = image.isPredominantlyLight
+                        _ = image.withDropShadow(color: .black, radius: 4, offset: CGSize(width: 0, height: 1.5), opacity: 0.25)
+                        DispatchQueue.main.async {
+                            completion(image, nil)
                         }
                     }
+                case .failure(let error): completion(nil, error)
+                }
+            }
+            return Task {
+                await withTaskCancellationHandler {
+                    if Task.isCancelled {
+                        imageTask.cancel()
+                    }
+                } onCancel: {
+                    imageTask.cancel()
                 }
             }
         }
@@ -518,7 +535,7 @@ private extension FeaturedViewController
             DispatchQueue.main.async {
                 switch result
                 {
-                case .failure(OperationError.cancelled): break // Ignore
+                case .failure(let error) where error is CancellationError: break // Ignore
                 case .failure(let error):
                     let toastView = ToastView(error: error)
                     toastView.opensErrorLog = true
@@ -612,12 +629,11 @@ extension FeaturedViewController
             
             let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: kind, for: indexPath) as! UICollectionViewListCell
             
-            var content: UIListContentConfiguration = if #available(iOS 15, *) {
-                .prominentInsetGroupedHeader()
-            }
-            else {
-                .groupedHeader()
-            }
+            #if !os(tvOS)
+            var content: UIListContentConfiguration = .prominentInsetGroupedHeader()
+            #else
+            var content: UIListContentConfiguration = .groupedHeader()
+            #endif
             
             switch section
             {
@@ -642,8 +658,18 @@ extension FeaturedViewController
             buttonView.tintColor = storeApp.source?.effectiveTintColor?.adjustedForDisplay ?? .altPrimary
             
             buttonView.button.setTitle(NSLocalizedString("See All", comment: ""), for: .normal)
-            buttonView.button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
-            buttonView.button.contentEdgeInsets.bottom = 8
+            let font = UIFont.preferredFont(forTextStyle: .body)
+            var config = UIButton.Configuration.plain()
+            config.cornerStyle = .fixed
+            config.background.cornerRadius = 0
+            config.contentInsets = .zero
+            config.baseForegroundColor = buttonView.tintColor
+            config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+                var outgoing = incoming
+                outgoing.font = font
+                return outgoing
+            }
+            buttonView.button.configuration = config
             
             buttonView.button.removeAction(identifiedBy: .showAllApps, for: .primaryActionTriggered)
             
@@ -682,64 +708,3 @@ extension FeaturedViewController
     }
 }
 
-@available(iOS 17, *)
-#Preview(traits: .portrait) {
-    DatabaseManager.shared.startForPreview()
-    
-    let storyboard = UIStoryboard(name: "Main", bundle: nil)
-    let featuredViewController = storyboard.instantiateViewController(identifier: "featuredViewController")
-    
-    let navigationController = UINavigationController(rootViewController: featuredViewController)
-    navigationController.navigationBar.prefersLargeTitles = true
-    navigationController.modalPresentationStyle = .fullScreen
-    
-    let viewController = UIViewController()
-    
-    AppManager.shared.fetchSources() { (result) in
-        do
-        {
-            let (_, context) = try result.get()
-            try context.save()
-        }
-        catch let error as NSError
-        {
-            debugLog("Failed to fetch sources for preview. \(error.localizedDescription)")
-        }
-    }
-    
-    AppManager.shared.updateKnownSources { result in
-        Task {
-            do
-            {
-                let knownSources = try result.get()
-                
-                let context = DatabaseManager.shared.persistentContainer.newBackgroundContext()
-                
-                await withThrowingTaskGroup(of: Void.self) { taskGroup in
-                    for source in knownSources.0
-                    {
-                        guard let sourceURL = source.sourceURL else { continue }
-                        
-                        taskGroup.addTask {
-                            _ = try await AppManager.shared.fetchSource(sourceURL: sourceURL, managedObjectContext: context)
-                        }
-                    }
-                }
-                
-                await context.performAsync {
-                    try! context.save()
-                }
-                
-                await MainActor.run {
-                    viewController.present(navigationController, animated: true)
-                }
-            }
-            catch
-            {
-                debugLog("Failed to fetch known sources for preview. \(error.localizedDescription)")
-            }
-        }
-    }
-    
-    return viewController
-}

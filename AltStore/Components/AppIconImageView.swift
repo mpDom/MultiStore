@@ -6,7 +6,7 @@
 //  Copyright © 2019 Riley Testut. All rights reserved.
 //
 
-import UIKit
+@preconcurrency import UIKit
 
 extension AppIconImageView
 {
@@ -93,8 +93,44 @@ class AppIconImageView: UIImageView
     }
 }
 
-private extension UIImage
+private class LightCacheBox {
+    let value: Bool
+    init(_ value: Bool) {
+        self.value = value
+    }
+}
+
+private let isPredominantlyLightCache = NSCache<AnyObject, LightCacheBox>()
+private let dropShadowCache = NSCache<AnyObject, UIImage>()
+
+extension UIImage
 {
+    var cachedIsPredominantlyLight: Bool? {
+        get {
+            return isPredominantlyLightCache.object(forKey: self)?.value
+        }
+        set {
+            if let newValue = newValue {
+                isPredominantlyLightCache.setObject(LightCacheBox(newValue), forKey: self)
+            } else {
+                isPredominantlyLightCache.removeObject(forKey: self)
+            }
+        }
+    }
+    
+    var cachedDropShadowImage: UIImage? {
+        get {
+            return dropShadowCache.object(forKey: self)
+        }
+        set {
+            if let newValue = newValue {
+                dropShadowCache.setObject(newValue, forKey: self)
+            } else {
+                dropShadowCache.removeObject(forKey: self)
+            }
+        }
+    }
+
     var hasAlphaChannel: Bool {
         guard let cgImage = self.cgImage else { return false }
         let alphaInfo = cgImage.alphaInfo
@@ -104,6 +140,10 @@ private extension UIImage
     }
     
     var isPredominantlyLight: Bool {
+        if let cached = self.cachedIsPredominantlyLight {
+            return cached
+        }
+        
         guard let cgImage = self.cgImage else { return false }
         
         let width = 16
@@ -149,25 +189,34 @@ private extension UIImage
         }
         
         if totalOpaquePixels == 0 {
+            self.cachedIsPredominantlyLight = false
             return false
         }
         
         let averageLuminance = totalLuminance / totalOpaquePixels
-        return averageLuminance > 0.5
+        let result = averageLuminance > 0.5
+        self.cachedIsPredominantlyLight = result
+        return result
     }
     
     func withDropShadow(color: UIColor, radius: CGFloat, offset: CGSize, opacity: Float) -> UIImage?
     {
+        if let cached = self.cachedDropShadowImage {
+            return cached
+        }
+        
         let shadowColor = color.withAlphaComponent(CGFloat(opacity)).cgColor
         
         let format = UIGraphicsImageRendererFormat()
         format.scale = self.scale
         
         let renderer = UIGraphicsImageRenderer(size: self.size, format: format)
-        return renderer.image { context in
+        let result = renderer.image { context in
             let cgContext = context.cgContext
             cgContext.setShadow(offset: offset, blur: radius, color: shadowColor)
             self.draw(in: CGRect(origin: .zero, size: self.size))
         }
+        self.cachedDropShadowImage = result
+        return result
     }
 }

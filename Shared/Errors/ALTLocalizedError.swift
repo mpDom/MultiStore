@@ -8,12 +8,10 @@
 
 import Foundation
 
-#if !ALTJIT
-import AltSign
-#endif
-
 public let ALTLocalizedTitleErrorKey = "ALTLocalizedTitle"
 public let ALTLocalizedDescriptionKey = "ALTLocalizedDescription"
+public let ALTSourceFileErrorKey = "ALTSourceFile"
+public let ALTSourceLineErrorKey = "ALTSourceLine"
 
 public protocol ALTLocalizedError<Code>: LocalizedError, CustomNSError, CustomStringConvertible
 {
@@ -41,7 +39,7 @@ public extension ALTLocalizedError
     }
 }
 
-public protocol ALTErrorCode: RawRepresentable where RawValue == Int
+public protocol ALTErrorCode: Sendable, RawRepresentable where RawValue == Int
 {
     associatedtype Error: ALTLocalizedError where Error.Code == Self
     static var errorDomain: String { get } // Optional

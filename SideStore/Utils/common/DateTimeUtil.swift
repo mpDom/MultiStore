@@ -1,6 +1,6 @@
 //
 //  DateTimeUtil.swift
-//  AltStore
+//  SideStore
 //
 //  Created by Magesh K on 02/01/25.
 //  Copyright © 2025 SideStore. All rights reserved.

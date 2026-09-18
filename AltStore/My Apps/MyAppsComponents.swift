@@ -6,7 +6,7 @@
 //  Copyright © 2019 Riley Testut. All rights reserved.
 //
 
-import UIKit
+@preconcurrency import UIKit
 
 final class InstalledAppCollectionViewCell: UICollectionViewCell
 {
@@ -49,6 +49,11 @@ final class InstalledAppCollectionViewCell: UICollectionViewCell
         ])
         
         self.deactivateBadge = deactivateBadge
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.bannerView?.button?.resetDisplayState()
     }
 }
 

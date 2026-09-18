@@ -6,14 +6,12 @@
 //  Copyright © 2019 Riley Testut. All rights reserved.
 //
 
-import UIKit
+@preconcurrency import UIKit
 import Combine
 import CoreData
-import AltStoreCore
+@preconcurrency import Nuke
 
-import Nuke
-
-class BrowseViewController: UICollectionViewController, PeekPopPreviewing
+class BrowseViewController: UICollectionViewController
 {
     // Nil == Show apps from all sources.
     let source: Source?
@@ -37,7 +35,7 @@ class BrowseViewController: UICollectionViewController, PeekPopPreviewing
     private let prototypeCell = AppCardCollectionViewCell(frame: .zero)
     private var sortButton: UIBarButtonItem?
     
-    private var preferredAppSorting: AppSorting = UserDefaults.shared.preferredAppSorting
+    private var preferredAppSorting: AppSorting = UserDefaults.standard.preferredAppSorting
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -85,7 +83,9 @@ class BrowseViewController: UICollectionViewController, PeekPopPreviewing
                                                                #keyPath(StoreApp.subtitle),
                                                                #keyPath(StoreApp.developerName),
                                                                #keyPath(StoreApp.bundleIdentifier)]
+        #if !os(tvOS)
         self.navigationItem.searchController = self.dataSource.searchController
+        #endif
         
         self.prototypeCell.contentView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -98,13 +98,16 @@ class BrowseViewController: UICollectionViewController, PeekPopPreviewing
         let collectionViewLayout = self.collectionViewLayout as! UICollectionViewFlowLayout
         collectionViewLayout.minimumLineSpacing = 30
         
-        (self as PeekPopPreviewing).registerForPreviewing(with: self, sourceView: self.collectionView)
+        #if !os(tvOS)
+        self.registerForPreviewing(with: self, sourceView: self.collectionView)
         
         let refreshControl = UIRefreshControl(frame: .zero, primaryAction: UIAction { [weak self] _ in
             self?.updateSources()
         })
         self.collectionView.refreshControl = refreshControl
+        #endif
         
+        #if !os(tvOS)
         if self.category != nil, #available(iOS 16, *)
         {
             let categoriesMenu = UIMenu(children: [
@@ -116,6 +119,7 @@ class BrowseViewController: UICollectionViewController, PeekPopPreviewing
             
             self.navigationItem.titleMenuProvider = { _ in categoriesMenu }
         }
+        #endif
         
         self.titleSourceIconView = AppIconImageView(style: .circular)
         
@@ -129,17 +133,16 @@ class BrowseViewController: UICollectionViewController, PeekPopPreviewing
         self.titleStackView.spacing = 4
         self.titleStackView.translatesAutoresizingMaskIntoConstraints = false
         
+        #if !os(tvOS)
         self.navigationItem.largeTitleDisplayMode = .never
         
         if #available(iOS 16, *)
         {
             self.navigationItem.preferredSearchBarPlacement = .automatic
         }
+        #endif
         
-        if #available(iOS 15, *)
-        {
-            self.prepareAppSorting()
-        }
+        self.prepareAppSorting()
         
         self.preparePipeline()
         
@@ -263,18 +266,30 @@ private extension BrowseViewController
             let tintColor = app.tintColor ?? .altPrimary
             cell.tintColor = tintColor
         }
-        dataSource.prefetchHandler = { (storeApp, indexPath, completionHandler) -> Foundation.Operation? in
+        dataSource.prefetchHandler = { (storeApp, indexPath, completionHandler) in
             let iconURL = storeApp.iconURL
-            
-            return RSTAsyncBlockOperation() { (operation) in
-                ImagePipeline.shared.loadImage(with: iconURL, progress: nil) { result in
-                    guard !operation.isCancelled else { return operation.finish() }
-                    
-                    switch result
-                    {
-                    case .success(let response): completionHandler(response.image, nil)
-                    case .failure(let error): completionHandler(nil, error)
+            let imageTask = ImagePipeline.shared.loadImage(with: iconURL, progress: nil) { result in
+                switch result
+                {
+                case .success(let response):
+                    let image = response.image
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        _ = image.isPredominantlyLight
+                        _ = image.withDropShadow(color: .black, radius: 4, offset: CGSize(width: 0, height: 1.5), opacity: 0.25)
+                        DispatchQueue.main.async {
+                            completionHandler(image, nil)
+                        }
                     }
+                case .failure(let error): completionHandler(nil, error)
+                }
+            }
+            return Task {
+                await withTaskCancellationHandler {
+                    if Task.isCancelled {
+                        imageTask.cancel()
+                    }
+                } onCancel: {
+                    imageTask.cancel()
                 }
             }
         }
@@ -307,7 +322,9 @@ private extension BrowseViewController
     func updateSources()
     {
         AppManager.shared.updateAllSources { result in
+            #if !os(tvOS)
             self.collectionView.refreshControl?.endRefreshing()
+            #endif
             
             guard case .failure(let error) = result else { return }
             
@@ -414,6 +431,7 @@ private extension BrowseViewController
         
         self.view.tintColor = tintColor
         
+        #if !os(tvOS)
         let appearance = NavigationBarAppearance()
         appearance.configureWithTintColor(tintColor)
         appearance.configureWithDefaultBackground()
@@ -423,6 +441,7 @@ private extension BrowseViewController
         
         self.navigationItem.standardAppearance = appearance
         self.navigationItem.scrollEdgeAppearance = edgeAppearance
+        #endif
         
         // Necessary to tint UISearchController's inline bar button.
         self.navigationController?.navigationBar.tintColor = tintColor
@@ -480,7 +499,6 @@ private extension BrowseViewController
         }
     }
     
-    @available(iOS 15, *)
     func prepareAppSorting()
     {
         if self.preferredAppSorting == .default && self.source == nil
@@ -490,7 +508,7 @@ private extension BrowseViewController
             self.preferredAppSorting = .lastUpdated
             
             // Don't update UserDefaults unless explicitly changed by user.
-            // UserDefaults.shared.preferredAppSorting = .lastUpdated
+            // UserDefaults.standard.preferredAppSorting = .lastUpdated
         }
         
         let children = UIDeferredMenuElement.uncached { [weak self] completion in
@@ -507,7 +525,7 @@ private extension BrowseViewController
                 let state: UIMenuElement.State = (sorting == self.preferredAppSorting) ? .on : .off
                 let action = UIAction(title: sorting.localizedName, image: nil, state: state) { action in
                     self.preferredAppSorting = sorting
-                    UserDefaults.shared.preferredAppSorting = sorting // Update separately to save change.
+                    UserDefaults.standard.preferredAppSorting = sorting // Update separately to save change.
                     
                     self.updateDataSource()
                 }
@@ -559,12 +577,6 @@ private extension BrowseViewController
         }
         
         Task(priority: .userInitiated) { @MainActor in
-            if let error = await minimuxerStatus.operationError {
-                let toastView = ToastView(error: error)
-                toastView.show(in: self)
-                return
-            }
-            
             // if let installedApp = app.installedApp, installedApp.isUpdateAvailable
             if let installedApp = app.installedApp, installedApp.hasUpdate
             {
@@ -578,13 +590,13 @@ private extension BrowseViewController
             }
         }
         
-        @MainActor
-        func finish(_ result: Result<InstalledApp, Error>)
+        nonisolated func finish(_ result: Result<InstalledApp, Error>)
         {
+            debugLog("BrowseViewController.finish invoked with result: \(result) for \(app.bundleIdentifier)")
             DispatchQueue.main.async {
                 switch result
                 {
-                case .failure(OperationError.cancelled): break // Ignore
+                case .failure(let error) where error is CancellationError: break // Ignore
                 case .failure(let error):
                     let toastView = ToastView(error: error, opensLog: true)
                     toastView.show(in: self)
@@ -595,10 +607,12 @@ private extension BrowseViewController
                 UIView.performWithoutAnimation {
                     if let indexPath = self.dataSource.fetchedResultsController.indexPath(forObject: app)
                     {
+                        debugLog("BrowseViewController.finish: reloading item at \(indexPath)")
                         self.collectionView.reloadItems(at: [indexPath])
                     }
                     else
                     {
+                        debugLog("BrowseViewController.finish: reloading section")
                         self.collectionView.reloadSections(IndexSet(integer: indexPath.section))
                     }
                 }
@@ -677,15 +691,3 @@ extension BrowseViewController: UIViewControllerPreviewingDelegate
     }
 }
 
-@available(iOS 17, *)
-#Preview(traits: .portrait) {
-    DatabaseManager.shared.startForPreview()
-   
-    let storyboard = UIStoryboard(name: "Main", bundle: .main)
-    let browseViewController = storyboard.instantiateViewController(identifier: "browseViewController") { coder in
-        BrowseViewController(source: nil, coder: coder)
-    }
-    
-    let navigationController = UINavigationController(rootViewController: browseViewController)
-    return navigationController
-}

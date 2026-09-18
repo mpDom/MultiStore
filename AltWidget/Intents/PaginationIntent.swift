@@ -10,11 +10,6 @@ import AppIntents
 import Intents
 import WidgetKit
 
-public enum Direction: String, Sendable{
-    case up
-    case down
-}
-
 public struct NavigationEvent {
     let direction: Direction?
     var consumed: Bool = false
@@ -47,9 +42,11 @@ class PaginationIntent: AppIntent, @unchecked Sendable {
         self.widgetID = widgetID ?? WidgetUpdateIntent.COMMON_WIDGET_ID
         self.direction = direction.rawValue
         self.widgetKind = widgetKind
+        debugLog("[PaginationIntent] Initialized with widgetID: \(self.widgetID), direction: \(self.direction), widgetKind: \(self.widgetKind)")
     }
     
     func perform() async throws -> some IntentResult {
+        debugLog("[PaginationIntent] Performing pagination intent: widgetKind=\(widgetKind), widgetID=\(widgetID), direction=\(direction)")
         // Post the navigation event into the shared db (Dictionary) and ask to reload
         DispatchQueue(label: String(widgetID)).sync {
             self.postThisNavigationEvent()

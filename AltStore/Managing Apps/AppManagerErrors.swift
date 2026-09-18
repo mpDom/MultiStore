@@ -8,11 +8,10 @@
 
 import Foundation
 import CoreData
-import AltStoreCore
 
 extension AppManager
 {
-    struct FetchSourcesError: LocalizedError, CustomNSError
+    struct FetchSourcesError: LocalizedError, CustomNSError, @unchecked Sendable
     {
         var primaryError: Error?
         
@@ -88,7 +87,7 @@ extension AppManager
             var userInfo = [String: Any]()
             userInfo[ALTLocalizedTitleErrorKey] = self.localizedTitle
             userInfo[NSUnderlyingErrorKey] = self.primaryError
-            if #available(iOS 14.5, *), !errors.isEmpty {
+            if !errors.isEmpty {
                 userInfo[NSMultipleUnderlyingErrorsKey] = errors
             }
             return userInfo

@@ -8,31 +8,42 @@
 
 import Foundation
 
+// @livecontainer
+private extension Bundle {
+    @objc dynamic static let activeBundle: Bundle = Bundle.main
+    @objc dynamic static let storeAppBundleIdentifier = "com.SideStore.SideStore"
+    // Multi-account fork identity: must match the app's actual bundle id (BASE_BUNDLE_ID in
+    // Build.xcconfig) so the keychain namespace, app group and self-refresh detection are
+    // isolated from — and don't collide with — a coexisting SideStore install.
+    @objc dynamic static let appbundleIdentifier = "com.SideStore.MultiStore"
+}
+
 public extension Bundle
 {
     struct Info
     {
+        public static let activeBundle: Bundle = Bundle.activeBundle
+        public static let activeBundleURL: URL = activeBundle.bundleURL
+        public static let activeBundleVersion: String = {
+            let info = activeBundle.infoDictionary
+            let version = (info?["CFBundleShortVersionString"] as? String) ?? "?.?.?"
+            let build = (info?["CFBundleVersion"] as? String).map { " (\($0))" } ?? "(????)"
+            return NSLocalizedString(String(format: "Version %@%@", version, build), comment: "SideStore Version")
+        }()
+        public static let activeBundleIdentifier: String = activeBundle.bundleIdentifier!
+        public static let storeAppBundleIdentifier = Bundle.storeAppBundleIdentifier
+        public static let appbundleIdentifier = Bundle.appbundleIdentifier
+ 
         public static let deviceID = "ALTDeviceID"
         public static let serverID = "ALTServerID"
         public static let certificateID = "ALTCertificateID"
         public static let appGroups = "ALTAppGroups"
         public static let altBundleID = "ALTBundleIdentifier"
-        public static let storeAppBundleIdentifier =  "com.SideStore.SideStore"
-        // public static var appbundleIdentifier = Bundle.main.bundleIdentifier
-        // Multi-account fork identity: must match the app's actual bundle id (BASE_BUNDLE_ID in
-        // Build.xcconfig) so the keychain namespace, app group and self-refresh detection are
-        // isolated from — and don't collide with — a coexisting SideStore install.
-        public static let appbundleIdentifier = "com.SideStore.MultiStore"
-
+     
         public static let devicePairingString = "ALTPairingFile"
         public static let urlTypes = "CFBundleURLTypes"
         public static let exportedUTIs = "UTExportedTypeDeclarations"
         public static let backgroundModes = "UIBackgroundModes"
-        
-        public static let untetherURL = "ALTFugu14UntetherURL"
-        public static let untetherRequired = "ALTFugu14UntetherRequired"
-        public static let untetherMinimumiOSVersion = "ALTFugu14UntetherMinimumVersion"
-        public static let untetherMaximumiOSVersion = "ALTFugu14UntetherMaximumVersion"
     }
 }
 
@@ -61,13 +72,15 @@ public extension Bundle
 
 public extension Bundle
 {
-    static let baseAltStoreAppGroupID = "group." + Bundle.Info.appbundleIdentifier
+    // @livecontainer
+    @objc dynamic static let baseAltStoreAppGroupID = "group." + Bundle.Info.appbundleIdentifier
 
     var appGroups: [String] {
         return self.infoDictionary?[Bundle.Info.appGroups] as? [String] ?? []
     }
     
-    var altstoreAppGroup: String? {        
+    // @livecontainer
+    @objc dynamic var altstoreAppGroup: String? {
         let appGroup = self.appGroups.first { $0.contains(Bundle.baseAltStoreAppGroupID) }
         return appGroup
     }
@@ -75,5 +88,17 @@ public extension Bundle
     var completeInfoDictionary: [String : Any]? {
         let infoPlistURL = self.infoPlistURL
         return NSDictionary(contentsOf: infoPlistURL) as? [String : Any]
+    }
+}
+
+public extension String {
+    var isAltStoreAppID: Bool {
+        let activeID   = Bundle.Info.activeBundleIdentifier
+        let altstoreID = Bundle.Info.appbundleIdentifier
+        
+        let matchesActiveBundle   = !activeID.isEmpty && self.contains(activeID)
+        let matchesAltStoreBundle = !altstoreID.isEmpty && self.contains(altstoreID)
+        
+        return matchesActiveBundle || matchesAltStoreBundle
     }
 }

@@ -6,13 +6,8 @@
 //  Copyright © 2021 Riley Testut. All rights reserved.
 //
 
-import UIKit
-import SafariServices
-import MessageUI
-import Intents
-import IntentsUI
-
-import AltSign
+@preconcurrency import UIKit
+@preconcurrency import AltSign
 
 final class SelectTeamViewController: UITableViewController
 {
@@ -21,9 +16,11 @@ final class SelectTeamViewController: UITableViewController
     
     private var prototypeHeaderFooterView: SettingsHeaderFooterView!
     
+    #if !os(tvOS)
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
+    #endif
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1

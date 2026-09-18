@@ -6,11 +6,11 @@
 //  Copyright © 2022 Riley Testut. All rights reserved.
 //
 
-import UIKit
+@preconcurrency import UIKit
 
 @objc(ErrorLogMenuButton)
 private final class ErrorLogMenuButton: UIButton {
-    @available(iOS 14.0, *)
+    @available(tvOS 17.0, *)
     override func menuAttachmentPoint(for configuration: UIContextMenuConfiguration) -> CGPoint {
         var point = super.menuAttachmentPoint(for: configuration)
         point.y = self.bounds.midY

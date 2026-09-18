@@ -8,7 +8,7 @@
 
 import AppIntents
 
-@available(iOS 17, *)
+@available(iOS 17, tvOS 17, *)
 public struct ShortcutsProvider: AppShortcutsProvider
 {
     public static var appShortcuts: [AppShortcut] {

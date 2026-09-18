@@ -8,7 +8,7 @@
 
 import AppIntents
 
-@available(iOS 17, *)
+@available(iOS 17, tvOS 17, *)
 struct RefreshAllAppsWidgetIntent: AppIntent, ProgressReportingIntent
 {
     static var title: LocalizedStringResource { "Refresh Apps via Widget" }
@@ -42,4 +42,5 @@ struct RefreshAllAppsWidgetIntent: AppIntent, ProgressReportingIntent
 // Unfortunately `ForegroundContinuableIntent` is marked as unavailable in app extensions,
 // so we "conform" RefreshAllAppsWidgetIntent to it in an `unavailable` extension ¯\_(ツ)_/¯
 @available(iOS, unavailable)
+@available(tvOS, unavailable)
 extension RefreshAllAppsWidgetIntent: ForegroundContinuableIntent {}

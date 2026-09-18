@@ -6,7 +6,7 @@
 //  Copyright © 2019 Riley Testut. All rights reserved.
 //
 
-import UIKit
+@preconcurrency import UIKit
 
 final class CollapsingTextView: UITextView
 {
@@ -151,23 +151,14 @@ private extension CollapsingTextView
         self.isCollapsed.toggle()
     }
     
-    @available(iOS 16, *)
     func updateText()
     {
-        do
-        {
-            let style = NSMutableParagraphStyle()
-            style.lineSpacing = self.lineSpacing
-            
-            var attributedText = try AttributedString(self.attributedText, including: \.uiKit)
-            attributedText[AttributeScopes.UIKitAttributes.ParagraphStyleAttribute.self] = style
-            
-            self.attributedText = NSAttributedString(attributedText)
-        }
-        catch
-        {
-            debugLog("[ALTLog] Failed to update CollapsingTextView line spacing: \(error)")
-        }
+        guard let currentText = self.attributedText else { return }
+        let mutableText = NSMutableAttributedString(attributedString: currentText)
+        let style = NSMutableParagraphStyle()
+        style.lineSpacing = self.lineSpacing
+        mutableText.addAttribute(.paragraphStyle, value: style, range: NSRange(location: 0, length: mutableText.length))
+        self.attributedText = mutableText
     }
 }
 

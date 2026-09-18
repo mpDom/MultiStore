@@ -6,8 +6,7 @@
 //  Copyright © 2023 Riley Testut. All rights reserved.
 //
 
-import UIKit
-import AltStoreCore
+@preconcurrency import UIKit
 
 extension AppScreenshotCollectionViewCell
 {
@@ -26,6 +25,8 @@ extension AppScreenshotCollectionViewCell
 class AppScreenshotCollectionViewCell: UICollectionViewCell
 {
     let imageView: UIImageView
+    let reloadImageView: UIImageView
+    var onRetry: (() -> Void)?
     
     var aspectRatio: CGSize = AppScreenshot.defaultAspectRatio {
         didSet {
@@ -49,6 +50,8 @@ class AppScreenshotCollectionViewCell: UICollectionViewCell
         self.imageView.layer.cornerCurve = .continuous
         self.imageView.layer.borderColor = UIColor.tertiaryLabel.cgColor
         
+        self.reloadImageView = UIImageView()
+        
         super.init(frame: frame)
         
         self.imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -68,6 +71,26 @@ class AppScreenshotCollectionViewCell: UICollectionViewCell
             self.imageView.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor),
             self.imageView.centerYAnchor.constraint(equalTo: self.contentView.centerYAnchor)
         ])
+        
+        let reloadConfig = UIImage.SymbolConfiguration(pointSize: 18, weight: .regular)
+        let reloadImage = UIImage(systemName: "arrow.clockwise", withConfiguration: reloadConfig)
+        self.reloadImageView.image = reloadImage?.withRenderingMode(.alwaysTemplate)
+        self.reloadImageView.tintColor = .label
+        self.reloadImageView.contentMode = .scaleAspectFit
+        self.reloadImageView.isUserInteractionEnabled = true
+        self.reloadImageView.isHidden = true
+        self.reloadImageView.translatesAutoresizingMaskIntoConstraints = false
+        self.contentView.addSubview(self.reloadImageView)
+        
+        NSLayoutConstraint.activate([
+            self.reloadImageView.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor),
+            self.reloadImageView.centerYAnchor.constraint(equalTo: self.contentView.centerYAnchor),
+            self.reloadImageView.widthAnchor.constraint(equalToConstant: 24),
+            self.reloadImageView.heightAnchor.constraint(equalToConstant: 24)
+        ])
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(AppScreenshotCollectionViewCell.reloadButtonTapped))
+        self.reloadImageView.addGestureRecognizer(tap)
         
         self.updateAspectRatio()
         self.updateTraits()
@@ -108,6 +131,8 @@ extension AppScreenshotCollectionViewCell
             self.imageView.image = image
             return
         }
+        
+        self.reloadImageView.isHidden = true
                 
         if image.size.width > image.size.height && self.aspectRatio.width < self.aspectRatio.height
         {
@@ -116,6 +141,11 @@ extension AppScreenshotCollectionViewCell
         }
         
         self.imageView.image = image
+    }
+    
+    @objc private func reloadButtonTapped()
+    {
+        self.onRetry?()
     }
 }
 

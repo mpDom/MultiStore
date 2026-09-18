@@ -6,9 +6,8 @@
 //  Copyright © 2019 Riley Testut. All rights reserved.
 //
 
-import UIKit
+@preconcurrency import UIKit
 import CoreData
-import AltStoreCore
 
 @objc(RefreshAttemptTableViewCell)
 private final class RefreshAttemptTableViewCell: UITableViewCell

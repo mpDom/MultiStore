@@ -6,10 +6,9 @@
 //  Copyright © 2023 Riley Testut. All rights reserved.
 //
 
-import UIKit
+@preconcurrency import UIKit
 import SwiftUI
 import CoreData
-import AltStoreCore
 
 extension AppDetailCollectionViewController
 {
@@ -177,7 +176,9 @@ private extension AppDetailCollectionViewController
             case .unknownEntitlements where !unknownEntitlementPermissions.isEmpty:
                 var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
                 configuration.headerMode = .supplementary
+                #if !os(tvOS)
                 configuration.showsSeparators = false
+                #endif
                 configuration.backgroundColor = .altBackground
                 
                 let layoutSection = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: layoutEnvironment)
@@ -203,7 +204,7 @@ private extension AppDetailCollectionViewController
         dataSource.cellIdentifierHandler = { _ in "PrivacyCell" }
         dataSource.numberOfSectionsHandler = { 1 }
         dataSource.dynamicCellConfigurationHandler = { [weak self] (cell, indexPath) in
-            guard let self, #available(iOS 16, *) else { return }
+            guard let self, #available(iOS 16, tvOS 16, *) else { return }
             
             cell.contentConfiguration = UIHostingConfiguration {
                 AppPermissionsCard(title: "Privacy",
@@ -214,7 +215,7 @@ private extension AppDetailCollectionViewController
             .margins(.horizontal, 0)
         }
         
-        if #available(iOS 16, *)
+        if #available(iOS 16, tvOS 16, *)
         {
             dataSource.numberOfItemsHandler = { [privacyPermissions] _ in !privacyPermissions.isEmpty ? 1 : 0 }
         }
@@ -246,7 +247,7 @@ private extension AppDetailCollectionViewController
                 content.image = UIImage(systemName: appPermission.effectiveSymbolName)
                 content.imageProperties.tintColor = tintColor
                 
-                if #available(iOS 15.4, *) /*, let self */ // Capturing self leads to strong-reference cycle.
+                if #available(iOS 15.4, tvOS 15.4, *)
                 {
                     let detailAccessory = UICellAccessory.detail(options: .init(tintColor: tintColor)) {
                         self?.showPermissionAlert(for: appPermission)

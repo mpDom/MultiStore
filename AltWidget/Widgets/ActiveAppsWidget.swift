@@ -8,7 +8,6 @@
 
 import SwiftUI
 import WidgetKit
-import AltStoreCore
 
 import GameplayKit
 
@@ -37,6 +36,7 @@ struct ActiveAppsWidget: Widget
     init(){
         widgetKind = "ActiveApps - \(Self.id)"
         Self.id += 1
+        debugLog("[ActiveAppsWidget] Initialized instance with widgetKind: \(widgetKind)")
     }
     
     public var body: some WidgetConfiguration {
@@ -59,9 +59,12 @@ struct ActiveAppsWidget: Widget
         }
         else
         {
-            // Can't mark ActiveAppsWidget as requiring iOS 17 directly without causing crash on older versions.
-            // So instead we just return EmptyWidgetConfiguration pre-iOS 17.
-            return EmptyWidgetConfiguration()
+            return StaticConfiguration(kind: widgetKind, provider: UnsupportedTimelineProvider()) { _ in
+                UnsupportedWidgetView(requiredVersion: "iOS 17")
+            }
+            .supportedFamilies([.systemMedium])
+            .configurationDisplayName("Active Apps")
+            .description("Requires iOS 17 or later.")
         }
     }
 }
@@ -120,7 +123,7 @@ private struct ActiveAppsWidgetView: View
                 LazyVStack(spacing: 12) {
                     ForEach(Array(entry.apps.enumerated()), id: \.offset) { index, app in
                     
-                        let icon: UIImage = app.icon ?? UIImage(named: "SideStore")!
+                        let icon: UIImage = app.icon ?? UIImage(named: "SideStore") ?? UIImage(systemName: "app.fill")!
                         
                         // 1024x1024 images are not supported by previews but supported by device
                         // so we scale the image to 97% so as to reduce its actual size but not too much
@@ -132,7 +135,7 @@ private struct ActiveAppsWidgetView: View
                             height: icon.size.height * scalingFactor
                         )
                         
-                        let resizedIcon = icon.resizing(to: resizedSize)!
+                        let resizedIcon = icon.resizing(to: resizedSize) ?? icon
                         let cornerRadius = rowHeight / 5.0
                         let daysRemaining = app.expirationDate.numberOfCalendarDays(since: entry.date)
 
@@ -216,14 +219,25 @@ private struct ActiveAppsWidgetView: View
                 
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .onAppear {
+                debugLog("[ActiveAppsWidgetView] onAppear: isPlaceholder=\(entry.isPlaceholder), appsCount=\(entry.apps.count), date=\(entry.date)")
+            }
         }
     }
     
     private var placeholder: some View {
-        Text("App Not Found")
-            .font(.system(.body, design: .rounded))
-            .fontWeight(.semibold)
-            .foregroundColor(Color.white.opacity(0.4))
+        VStack(spacing: 4) {
+            Text("Open SideStore")
+                .font(.system(.body, design: .rounded))
+                .fontWeight(.semibold)
+                .foregroundColor(Color.white.opacity(0.8))
+            Text("Launch app to update widget")
+                .font(.system(.caption, design: .rounded))
+                .foregroundColor(Color.white.opacity(0.5))
+                .multilineTextAlignment(.center)
+        }
+        .padding()
+        .unredacted()
     }
 }
 
@@ -234,14 +248,14 @@ private struct ActiveAppsWidgetView: View
     let expiredDate = Date().addingTimeInterval(1 * 60 * 60 * 24 * 7)
     let (altstore, delta, clip, longAltStore, longDelta, longClip) = AppSnapshot.makePreviewSnapshots()
     
-    AppsEntry<Any>(date: Date(), apps: [altstore, delta, clip])
-    AppsEntry<Any>(date: Date(), apps: [longAltStore, longDelta, longClip])
+    AppsEntry<Void>(date: Date(), apps: [altstore, delta, clip])
+    AppsEntry<Void>(date: Date(), apps: [longAltStore, longDelta, longClip])
     
-    AppsEntry<Any>(date: expiredDate, apps: [altstore, delta, clip])
+    AppsEntry<Void>(date: expiredDate, apps: [altstore, delta, clip])
     
-    AppsEntry<Any>(date: Date(), apps: [altstore, delta])
-    AppsEntry<Any>(date: Date(), apps: [altstore])
+    AppsEntry<Void>(date: Date(), apps: [altstore, delta])
+    AppsEntry<Void>(date: Date(), apps: [altstore])
     
-    AppsEntry<Any>(date: Date(), apps: [])
-    AppsEntry<Any>(date: Date(), apps: [], isPlaceholder: true)
+    AppsEntry<Void>(date: Date(), apps: [])
+    AppsEntry<Void>(date: Date(), apps: [], isPlaceholder: true)
 }

@@ -6,10 +6,8 @@
 //  Copyright © 2023 Riley Testut. All rights reserved.
 //
 
-import UIKit
+@preconcurrency import UIKit
 import CoreData
-import SafariServices
-import AltStoreCore
 
 import Nuke
 
@@ -101,8 +99,10 @@ private extension SourceDetailContentViewController
             case .news:
                 guard !source.newsItems.isEmpty else { return nil }
                 
-                // Underestimate height to prevent jumping size abruptly.
-                let heightDimension: NSCollectionLayoutDimension = if #available(iOS 17, *) { .uniformAcrossSiblings(estimate: 50) } else { .estimated(50) }
+                // Estimate height closer to actual NewsCollectionViewCell height to prevent collapsed cards.
+                let heightDimension: NSCollectionLayoutDimension = if #available(iOS 17, tvOS 17, *) {
+                    .uniformAcrossSiblings(estimate: 160) } else { .estimated(160)
+                }
                 let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: heightDimension)
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 
@@ -233,17 +233,14 @@ private extension SourceDetailContentViewController
             cell.bannerView.iconImageView.image = nil
             cell.bannerView.iconImageView.isIndicatingActivity = true
         }
-        dataSource.prefetchHandler = { (storeApp, indexPath, completion) -> Foundation.Operation? in
-            return RSTAsyncBlockOperation { (operation) in
-                storeApp.managedObjectContext?.perform {
-                    ImagePipeline.shared.loadImage(with: storeApp.iconURL, progress: nil) { result in
-                        guard !operation.isCancelled else { return operation.finish() }
-                        
-                        switch result
-                        {
-                        case .success(let response): completion(response.image, nil)
-                        case .failure(let error): completion(nil, error)
-                        }
+        dataSource.prefetchHandler = { (storeApp, indexPath, completion) in
+            let iconURL = storeApp.iconURL
+            return Task.detached(priority: .background) {
+                ImagePipeline.shared.loadImage(with: iconURL, progress: nil) { result in
+                    switch result
+                    {
+                    case .success(let response): completion(response.image, nil)
+                    case .failure(let error): completion(nil, error)
                     }
                 }
             }
@@ -354,9 +351,7 @@ extension SourceDetailContentViewController
         case (.news, let newsItem as NewsItem):
             if let externalURL = newsItem.externalURL
             {
-                let safariViewController = SFSafariViewController(url: externalURL)
-                safariViewController.preferredControlTintColor = newsItem.tintColor
-                self.present(safariViewController, animated: true, completion: nil)
+                self.openWebURL(externalURL, preferredTintColor: newsItem.tintColor)
             }
             else if let storeApp = newsItem.storeApp
             {
@@ -435,6 +430,12 @@ private extension SourceDetailContentViewController
         }
         
         sender.progress = nil
+        if let index = self.appsDataSource.items.firstIndex(of: storeApp) {
+            let indexPath = IndexPath(item: index, section: Section.featuredApps.rawValue)
+            UIView.performWithoutAnimation {
+                self.collectionView.reloadItems(at: [indexPath])
+            }
+        }
     }
     
     func open(_ installedApp: InstalledApp)

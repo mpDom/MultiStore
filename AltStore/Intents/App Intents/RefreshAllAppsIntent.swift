@@ -7,16 +7,14 @@
 //
 
 import AppIntents
-import WidgetKit
-import AltStoreCore
 
 // Shouldn't conform types we don't own to protocols we don't own, so make custom
 // NSError subclass that conforms to CustomLocalizedStringResourceConvertible instead.
 //
 // Would prefer to just conform ALTLocalizedError to CustomLocalizedStringResourceConvertible,
 // but that can't be done without raising minimum version for ALTLocalizedError to iOS 16 :/
-@available(iOS 16, *)
-class IntentError: NSError, CustomLocalizedStringResourceConvertible
+@available(iOS 16, tvOS 16, *)
+class IntentError: NSError, CustomLocalizedStringResourceConvertible, @unchecked Sendable
 {
     var localizedStringResource: LocalizedStringResource {
         return "\(self.localizedDescription)"
@@ -34,7 +32,7 @@ class IntentError: NSError, CustomLocalizedStringResourceConvertible
     }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 17.0, tvOS 17.0, *)
 struct InstallIPAIntent: AppIntent, ProgressReportingIntent
 {
     static var title: LocalizedStringResource = "Install IPA"
@@ -83,7 +81,7 @@ struct InstallIPAIntent: AppIntent, ProgressReportingIntent
     }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 17.0, tvOS 17.0, *)
 fileprivate extension InstallIPAIntent
 {
     static func startDatabaseIfNeeded() async throws
@@ -106,7 +104,7 @@ fileprivate extension InstallIPAIntent
     }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 17.0, tvOS 17.0, *)
 extension RefreshAllAppsIntent
 {
     private actor OperationActor
@@ -120,7 +118,7 @@ extension RefreshAllAppsIntent
     }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 17.0, tvOS 17.0, *)
 struct RefreshAllAppsIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableIntent, ProgressReportingIntent, ForegroundContinuableIntent
 {
     static let intentClassName = "RefreshAllIntent"
@@ -205,7 +203,7 @@ struct RefreshAllAppsIntent: AppIntent, CustomIntentMigratedAppIntent, Predictab
     }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 17.0, tvOS 17.0, *)
 private extension RefreshAllAppsIntent
 {
     func refreshAllApps() async throws
@@ -216,7 +214,7 @@ private extension RefreshAllAppsIntent
         let installedApps = await context.perform { InstalledApp.fetchAppsForRefreshingAll(in: context) }
         
         try await withCheckedThrowingContinuation { continuation in
-            let operation = AppManager.shared.backgroundRefresh(installedApps, presentsNotifications: self.presentsNotifications) { (result) in
+            let operation = try? AppManager.shared.backgroundRefresh(installedApps, presentsNotifications: self.presentsNotifications) { (result) in
                 do
                 {
                     let results = try result.get()
@@ -237,6 +235,11 @@ private extension RefreshAllAppsIntent
                 {
                     continuation.resume(throwing: error)
                 }
+            }
+            
+            guard let operation else {
+                debugLog("[RefreshAllAppsIntent] backgroundRefresh instance is nil")
+                return 
             }
             
             operation.ignoresServerNotFoundError = false

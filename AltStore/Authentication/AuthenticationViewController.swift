@@ -6,9 +6,9 @@
 //  Copyright © 2019 Riley Testut. All rights reserved.
 //
 
-import UIKit
+@preconcurrency import UIKit
 
-import AltSign
+@preconcurrency import AltSign
 
 final class AuthenticationViewController: UIViewController
 {
@@ -31,14 +31,14 @@ final class AuthenticationViewController: UIViewController
     {
         super.viewDidLoad()
         
-        // fetch anisette servers asap when loading Auth Screen (if list is empty
-        if(UserDefaults.standard.menuAnisetteServersList.isEmpty){
-            Task{
+        // fetch anisette servers asap when loading Auth Screen (if list is empty)
+        Task {
+            if await AnisetteServersManager.shared.getActiveServerURLs().isEmpty {
                 let sourceURL = UserDefaults.standard.menuAnisetteList
-                do{
-                    _ = try await AnisetteViewModel.getListOfServers(serverSource: sourceURL)
+                do {
+                    _ = try await AnisetteServersManager.shared.syncWithRemote(sourceURLString: sourceURL, forceRemote: true)
                     debugLog("AuthenticationViewController: Server list refresh request completed for sourceURL: \(sourceURL)")
-                }catch{
+                } catch {
                     debugLog("AuthenticationViewController: Server list refresh request Failed for sourceURL: \(sourceURL) Error: \(error)")
                 }
             }
@@ -49,9 +49,20 @@ final class AuthenticationViewController: UIViewController
         
         for view in [self.appleIDBackgroundView!, self.passwordBackgroundView!, self.signInButton!]
         {
+            #if !os(tvOS)
             view.clipsToBounds = true
+            #endif
             view.layer.cornerRadius = 16
         }
+
+        #if os(tvOS)
+        self.appleIDBackgroundView.backgroundColor = .clear
+        self.passwordBackgroundView.backgroundColor = .clear
+        self.appleIDBackgroundView.isUserInteractionEnabled = true
+        self.passwordBackgroundView.isUserInteractionEnabled = true
+        self.appleIDTextField.borderStyle = .roundedRect
+        self.passwordTextField.borderStyle = .roundedRect
+        #endif
 
         if UIScreen.main.isExtraCompactHeight
         {
@@ -122,7 +133,7 @@ private extension AuthenticationViewController
                 
             case .failure(let error as NSError):
                 DispatchQueue.main.async {
-                    let error = error.withLocalizedTitle(NSLocalizedString("Failed to Log In", comment: ""))
+                    let error = error.withLocalizedTitle(NSLocalizedString("Failed to Sign In", comment: ""))
                     let toastView = ToastView(error: error)
                     toastView.show(in: self)
                     toastView.backgroundColor = .white
@@ -134,6 +145,16 @@ private extension AuthenticationViewController
                 }
                 
             case .success((let account, let session)):
+                DispatchQueue.main.async {
+                    UIView.performWithoutAnimation {
+                        let title = NSLocalizedString("Authenticated", comment: "")
+                        let image = UIImage(systemName: "checkmark.circle.fill")
+                        self.signInButton.setTitle(title, for: .normal)
+                        self.signInButton.setImage(image, for: .normal)
+                        self.signInButton.isIndicatingActivity = false
+                        self.signInButton.layoutIfNeeded()
+                    }
+                }
                 self.completionHandler?((account, session, password))
             }
             
@@ -145,7 +166,9 @@ private extension AuthenticationViewController
     
     @IBAction func cancel(_ sender: UIBarButtonItem)
     {
-        self.completionHandler?(nil)
+        self.dismiss(animated: true) { [weak self] in
+            self?.completionHandler?(nil)
+        }
     }
 }
 
@@ -182,4 +205,16 @@ extension AuthenticationViewController
     {
         self.update()
     }
+
+    #if os(tvOS)
+    @objc private func focusAppleID()
+    {
+        self.appleIDTextField.becomeFirstResponder()
+    }
+    
+    @objc private func focusPassword()
+    {
+        self.passwordTextField.becomeFirstResponder()
+    }
+    #endif
 }

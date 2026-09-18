@@ -1,6 +1,6 @@
 //
 //  ConsoleCapture.swift
-//  AltStore
+//  SideStore
 //
 //  Created by Magesh K on 25/11/24.
 //  Copyright © 2024 SideStore. All rights reserved.
@@ -11,12 +11,6 @@ import Foundation
 protocol ConsoleLogger{
     func startCapturing()
     func stopCapturing()
-}
-
-
-public enum AbstractClassError: Error {
-    case abstractInitializerInvoked
-    case abstractMethodInvoked
 }
 
 public class AbstractConsoleLogger<T: OutputStream>: ConsoleLogger{
@@ -110,9 +104,7 @@ public class AbstractConsoleLogger<T: OutputStream>: ConsoleLogger{
                 return
             }
 
-            let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "UnknownApp"
             guard fcntl(fd, F_GETFD) != -1 else {
-                NSLog("[%@] ConsoleLogger: Original FD (%d) is invalid, skipping echo", appName, fd)
                 return
             }
 
@@ -128,7 +120,6 @@ public class AbstractConsoleLogger<T: OutputStream>: ConsoleLogger{
                     let written = write(fd, base.advanced(by: offset), chunkSize)
 
                     if written < 0 {
-                        NSLog("[%@] ConsoleLogger: Failed to re-echo to FD %d: %s", appName, fd, strerror(errno))
                         break
                     }
 

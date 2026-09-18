@@ -6,10 +6,8 @@
 //  Copyright © 2023 Riley Testut. All rights reserved.
 //
 
-import UIKit
+@preconcurrency import UIKit
 import WidgetKit
-import AltStoreCore
-import AltSign
 
 struct AppSnapshot
 {
@@ -24,18 +22,20 @@ struct AppSnapshot
 
 extension AppSnapshot
 {
-    // Declared in extension so we retain synthesized initializer.
-    init(installedApp: InstalledApp)
+    init(item: WidgetAppItem)
     {
-        self.name = installedApp.name
-        self.bundleIdentifier = installedApp.bundleIdentifier
-        self.expirationDate = installedApp.expirationDate
-        self.refreshedDate = installedApp.refreshedDate
+        self.name = item.name
+        self.bundleIdentifier = item.bundleIdentifier
+        self.expirationDate = item.expirationDate
+        self.refreshedDate = item.refreshedDate
         
-        self.tintColor = installedApp.storeApp?.tintColor
+        if let hex = item.tintColorHex {
+            self.tintColor = UIColor(hexString: hex)
+        } else {
+            self.tintColor = nil
+        }
         
-        let application = ALTApplication(fileURL: installedApp.fileURL)
-        self.icon = application?.icon?.resizing(toFill: CGSize(width: 180, height: 180))
+        self.icon = WidgetDataManager.shared.loadCachedIcon(for: item.bundleIdentifier)
     }
 }
 

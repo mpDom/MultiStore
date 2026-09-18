@@ -1,6 +1,6 @@
 //
 //  OperationsLoggingControl.swift
-//  AltStore
+//  SideStore
 //
 //  Created by Magesh K on 14/01/25.
 //  Copyright © 2025 SideStore. All rights reserved.
@@ -9,50 +9,42 @@
 import Foundation
 
 class OperationsLoggingControl {
+    
+    private static let defaultStepLoggingState = false
 
-    func updateDatabase(for operation: Operation.Type, value: Bool) {
-        Self.updateDatabase(for: operation, value: value)
+    static func isStepLoggingEnabled(for step: some OperationStep) -> Bool {
+        let key = udKey(for: step)
+        return getLoggingValueInDb(key: key) ?? defaultStepLoggingState
     }
-   
-    private static func updateDatabase(for operation: Operation.Type, value: Bool) {
-        // This method should handle the database update logic based on the operation and value
-        let key = Self.getKey(operation)
-        debugLog("Updating database for key: \(key), value: \(value)")
+
+    static func setStepLoggingEnabled(for step: some OperationStep, value: Bool) {
+        let key = udKey(for: step)
+        setLoggingState(key: key, value: value)
+    }
+
+    public static func isLoggingEnabled(for operation: any OperationLogging.Type) -> Bool {
+        guard UserDefaults.standard.isVerboseOperationsLoggingEnabled else { return false }
+        if let step = PipelineStep.step(for: operation) {
+            return isStepLoggingEnabled(for: step)
+        }
+        if let step = StandaloneStep.step(for: operation) {
+            return isStepLoggingEnabled(for: step)
+        }
+        return false
+    }
+
+    private static func udKey(for step: some OperationStep) -> String {
+        return "Step_\(step)"
+    }
+}
+
+private extension OperationsLoggingControl {
+    static func setLoggingState(key: String, value: Bool) {
         UserDefaults.standard.set(value, forKey: key)
     }
-    
-    private static func stripGenericTypeName(from string: String) -> String {
-        // ex: 1. "EnableJITOperation<DummyConformance>"
-        // ex: 1. "EnableJITOperation<DummyConformance<SomeMoreType>>"
-        // will become EnableJITOperation without the generics type info
-        if let range = string.range(of: "<") {
-            return String(string[..<range.lowerBound])
-        }
-        return string
-    }
-    
-    private static func getKey(_ operation: Operation.Type) -> String {
-        let processedOperation = Self.stripGenericTypeName(from: "\(operation)")
-        return "\(processedOperation)LoggingEnabled"
-    }
-    
-    func getFromDatabase(for operation: Operation.Type)  -> Bool{
-        return Self.getFromDatabase(for: operation)
-    }
 
-    static func getUpdatedFromDatabase(for operation: Operation.Type, defaultVal: Bool)  -> Bool{
-        let key = Self.getKey(operation)
-        let valueInDb = UserDefaults.standard.value(forKey: key) as? Bool
-        if valueInDb == nil {
-            // put the value if not already present
-            updateDatabase(for: operation, value: defaultVal)
-        }
-        return valueInDb ?? defaultVal
-    }
-
-    public static func getFromDatabase(for operation: Operation.Type) -> Bool {
-        let key = Self.getKey(operation)
-        return UserDefaults.standard.bool(forKey: key)
+    static func getLoggingValueInDb(key: String) -> Bool? {
+        return UserDefaults.standard.value(forKey: key) as? Bool
     }
 }
 

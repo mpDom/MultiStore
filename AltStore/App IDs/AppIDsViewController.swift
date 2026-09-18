@@ -6,11 +6,14 @@
 //  Copyright © 2020 Riley Testut. All rights reserved.
 //
 
-import UIKit
+@preconcurrency import UIKit
 import CoreData
-@preconcurrency import AltStoreCore
 import SwiftUI
-import AltSign
+@preconcurrency import AltSign
+
+extension AppIDsViewController {
+    static let didDismissNotification = Notification.Name("AppIDsViewControllerDidDismissNotification")
+}
 
 final class AppIDsViewController: UICollectionViewController
 {
@@ -28,6 +31,12 @@ final class AppIDsViewController: UICollectionViewController
     private weak var footerView: TextCollectionReusableView?
     
     @IBOutlet var activityIndicatorBarButtonItem: UIBarButtonItem!
+
+    override func viewWillDisappear(_ animated: Bool)
+    {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.post(name: AppIDsViewController.didDismissNotification, object: self)
+    }
     
     override func viewDidLoad()
     {
@@ -49,31 +58,7 @@ final class AppIDsViewController: UICollectionViewController
         
         if !self.didInitialFetch
         {
-            Task { @MainActor in
-                if UserDefaults.standard.isMinimuxerStatusCheckEnabled, await minimuxerStatus.operationError != nil
-                {
-                    // Silently skip initial network fetch
-                    self.didInitialFetch = true
-                    self.isLoading = false
-                    self.update()
-                }
-                else
-                {
-                    self.fetchAppIDs()
-                }
-            }
-        }
-    }
-
-    var isMinimuxerReady: Bool {
-        get async {
-            if UserDefaults.standard.isMinimuxerStatusCheckEnabled {
-                if let error = await minimuxerStatus.operationError {
-                    ToastView(error: error).show(in: self)
-                    return false
-                }
-            }
-            return true
+            self.fetchAppIDs()
         }
     }
 }
@@ -173,14 +158,7 @@ private extension AppIDsViewController
     
     @objc func fetchAppIDs()
     {
-        Task { @MainActor in
-            guard await isMinimuxerReady else
-            {
-                self.collectionView.refreshControl?.endRefreshing()
-                return
-            }
-            self.fetchAppIDsFromServer(completion: nil)
-        }
+        self.fetchAppIDsFromServer(completion: nil)
     }
     
     func fetchAppIDsFromServer(completion: (() -> Void)?)
@@ -188,12 +166,11 @@ private extension AppIDsViewController
         guard !self.isLoading else { return }
         self.isLoading = true
         
-        AppManager.shared.fetchAppIDs { [weak self] (result) in
+        AppManager.shared.syncAppIDs(presentingViewController: self) { [weak self] (result) in
             guard let self = self else { return }
             do
             {
-                let (_, context) = try result.get()
-                try context.save()
+                try result.get()
             }
             catch
             {
@@ -217,10 +194,16 @@ private extension AppIDsViewController
         
         if !isInitialLoading
         {
+            #if !os(tvOS)
             self.collectionView.refreshControl?.endRefreshing()
+            #endif
             self.activityIndicatorBarButtonItem.isIndicatingActivity = false
             
-            if let activeTeam = DatabaseManager.shared.activeTeam(), activeTeam.type != .free
+            let activeTeamType = DatabaseManager.shared.activeTeam()?.type
+            let allowsEditMode = (activeTeamType == .individual || activeTeamType == .organization) ||
+                                 (activeTeamType == .free && UserDefaults.standard.freeAcctAppIdDeletion)
+            
+            if allowsEditMode
             {
                 if self.isEditingMode
                 {
@@ -228,26 +211,29 @@ private extension AppIDsViewController
                     let title = selectedCount > 0 ? NSLocalizedString("Delete", comment: "") : NSLocalizedString("Cancel", comment: "")
                     let style: UIBarButtonItem.Style = selectedCount > 0 ? .done : .plain
                     self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: title, style: style, target: self, action: #selector(self.editButtonTapped))
+                    
+                    if selectedCount > 0
+                    {
+                        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Cancel", comment: ""), style: .plain, target: self, action: #selector(self.cancelButtonTapped))
+                    }
+                    else
+                    {
+                        self.navigationItem.rightBarButtonItem = nil
+                    }
                 }
                 else
                 {
                     self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Edit", comment: ""), style: .plain, target: self, action: #selector(self.editButtonTapped))
+                    self.navigationItem.rightBarButtonItem = self.doneBarButtonItem
                 }
             }
             else
             {
                 self.navigationItem.leftBarButtonItem = nil
-            }
-            
-            if self.isEditingMode
-            {
-                self.navigationItem.rightBarButtonItem = nil
-            }
-            else
-            {
                 self.navigationItem.rightBarButtonItem = self.doneBarButtonItem
             }
             
+            #if !os(tvOS)
             if self.isEditingMode
             {
                 self.collectionView.refreshControl = nil
@@ -261,6 +247,7 @@ private extension AppIDsViewController
                     self.collectionView.refreshControl = refreshControl
                 }
             }
+            #endif
         }
         else
         {
@@ -302,7 +289,14 @@ extension AppIDsViewController: UICollectionViewDelegateFlowLayout
         
         // NOTE: double dequeue of cell has been discontinued
         // TODO: Using harcoded value until this is fixed
-        return CGSize(width: collectionView.bounds.width, height: 200)
+        if let activeTeam = DatabaseManager.shared.activeTeam(), activeTeam.type == .free
+        {
+            return CGSize(width: collectionView.bounds.width, height: 220)
+        }
+        else
+        {
+            return CGSize(width: collectionView.bounds.width, height: 160)
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize
@@ -401,11 +395,31 @@ private extension AppIDsViewController
     
     func updateLeftBarButtonItem()
     {
+        self.updateBarButtonItems()
+    }
+    
+    func updateBarButtonItems()
+    {
+        guard self.isEditingMode else { return }
         let selectedCount = self.collectionView.indexPathsForSelectedItems?.count ?? 0
         let title = selectedCount > 0 ? NSLocalizedString("Delete", comment: "") : NSLocalizedString("Cancel", comment: "")
         let style: UIBarButtonItem.Style = selectedCount > 0 ? .done : .plain
         self.navigationItem.leftBarButtonItem?.title = title
         self.navigationItem.leftBarButtonItem?.style = style
+        
+        if selectedCount > 0
+        {
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Cancel", comment: ""), style: .plain, target: self, action: #selector(self.cancelButtonTapped))
+        }
+        else
+        {
+            self.navigationItem.rightBarButtonItem = nil
+        }
+    }
+    
+    @objc func cancelButtonTapped()
+    {
+        self.exitEditMode()
     }
     
     @objc func editButtonTapped()
@@ -416,8 +430,6 @@ private extension AppIDsViewController
                 let selectedCount = self.collectionView.indexPathsForSelectedItems?.count ?? 0
                 if selectedCount > 0
                 {
-                    guard await isMinimuxerReady else { return }
-                    
                     let alert = UIAlertController(
                         title: NSLocalizedString("Delete App IDs", comment: ""),
                         message: String(format: NSLocalizedString("Are you sure you want to proceed to delete %d appIds?", comment: ""), selectedCount),
@@ -436,7 +448,6 @@ private extension AppIDsViewController
             }
             else
             {
-                guard await isMinimuxerReady else { return }
                 self.enterEditMode()
             }
         }
@@ -560,7 +571,7 @@ private extension AppIDsViewController
                 await MainActor.run {
                     if let finalError = finalError
                     {
-                        Logger.sideload.error("Failed to delete App ID: \(finalError.localizedDescription)")
+                        debugLog("[AppIDsViewController] Failed to delete App ID: \(finalError.localizedDescription)")
                         
                         hostingController.dismiss(animated: true) {
                             let alertTitle = NSLocalizedString("Delete Failed", comment: "")
@@ -615,7 +626,7 @@ extension AppIDsViewController
     {
         if self.isEditingMode
         {
-            self.updateLeftBarButtonItem()
+            self.updateBarButtonItems()
             if let cell = collectionView.cellForItem(at: indexPath) as? AppBannerCollectionViewCell {
                 cell.setEditing(true, isSelected: true, animated: true)
             }
@@ -626,7 +637,7 @@ extension AppIDsViewController
     {
         if self.isEditingMode
         {
-            self.updateLeftBarButtonItem()
+            self.updateBarButtonItems()
             if let cell = collectionView.cellForItem(at: indexPath) as? AppBannerCollectionViewCell {
                 cell.setEditing(true, isSelected: false, animated: true)
             }

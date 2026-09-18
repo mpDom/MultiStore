@@ -6,8 +6,7 @@
 //  Copyright © 2019 Riley Testut. All rights reserved.
 //
 
-import UIKit
-import SafariServices
+@preconcurrency import UIKit
 
 final class PatreonViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout
 {
@@ -71,28 +70,19 @@ final class PatreonViewController: UICollectionViewController, UICollectionViewD
     @objc func openPatreonURL(_ sender: UIButton)
     {
         let patreonURL = URL(string: "https://www.patreon.com/SideStoreIO")!
-        
-        let safariViewController = SFSafariViewController(url: patreonURL)
-        safariViewController.preferredControlTintColor = self.view.tintColor
-        self.present(safariViewController, animated: true, completion: nil)
+        self.openWebURL(patreonURL, preferredTintColor: self.view.tintColor)
     }
     
     @objc func openTwitterURL(_ sender: UIButton)
     {
         let twitterURL = URL(string: "https://twitter.com/sidestoreio")!
-        
-        let safariViewController = SFSafariViewController(url: twitterURL)
-        safariViewController.preferredControlTintColor = self.view.tintColor
-        self.present(safariViewController, animated: true, completion: nil)
+        self.openWebURL(twitterURL, preferredTintColor: self.view.tintColor)
     }
     
     @objc func openInstagramURL(_ sender: UIButton)
     {
         let twitterURL = URL(string: "https://instagram.com/sidestore.io")!
-        
-        let safariViewController = SFSafariViewController(url: twitterURL)
-        safariViewController.preferredControlTintColor = self.view.tintColor
-        self.present(safariViewController, animated: true, completion: nil)
+        self.openWebURL(twitterURL, preferredTintColor: self.view.tintColor)
     }
 }
 

@@ -22,23 +22,25 @@ class PageInfoManager {
     
     func setPageInfo(forWidgetKind kind: String, forWidgetID id: Int, value: NavigationEvent?) {
         let key = getKey(forWidgetKind: kind, forWidgetID: id)
-//        UserDefaults.standard.set(value, forKey: key)
+        verboseLog("[PageInfoManager] setPageInfo for \(key): direction=\(String(describing: value?.direction)), consumed=\(String(describing: value?.consumed))")
         pageInfoMap[key] = value
     }
     
     func getPageInfo(forWidgetKind kind: String, forWidgetID id: Int) -> NavigationEvent? {
         let key = getKey(forWidgetKind: kind, forWidgetID: id)
-//        return UserDefaults.standard.value(forKey: key)
-        return pageInfoMap[key]
-   
+        let event = pageInfoMap[key]
+        verboseLog("[PageInfoManager] getPageInfo for \(key) -> \(event != nil ? "found" : "nil")")
+        return event
     }
 
     func popPageInfo(forWidgetKind kind: String, forWidgetID id: Int) -> NavigationEvent? {
         let key = getKey(forWidgetKind: kind, forWidgetID: id)
+        verboseLog("[PageInfoManager] popPageInfo for \(key)")
         return pageInfoMap.removeValue(forKey: key)
     }
 
     func clearAll() {
+        verboseLog("[PageInfoManager] clearAll called")
         pageInfoMap.removeAll()
     }
 }

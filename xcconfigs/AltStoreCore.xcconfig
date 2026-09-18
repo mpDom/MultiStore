@@ -1,4 +1,0 @@
-#include "../Build.xcconfig"
-
-PRODUCT_BUNDLE_IDENTIFIER = $(BASE_BUNDLE_ID).AltStoreCore
-CODE_SIGNING_ALLOWED = NO

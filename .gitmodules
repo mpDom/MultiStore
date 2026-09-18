@@ -3,12 +3,7 @@
     path = Dependencies/minimuxer
     url = https://github.com/SideStore/minimuxer
     branch = develop
-[submodule "Dependencies/em_proxy"]
-	path = Dependencies/em_proxy
-	url = https://github.com/mpDom/em_proxy
-	branch = multistore-prebuilt-fix
-
 [submodule "Dependencies/AltSign"]
     path = Dependencies/AltSign
     url = https://github.com/mpDom/AltSign
-    branch = multistore-signin-fix
+    branch = multistore-aug30-signin-fix

@@ -6,7 +6,7 @@
 //  Copyright © 2019 Riley Testut. All rights reserved.
 //
 
-import UIKit
+@preconcurrency import UIKit
 
 final class LicensesViewController: UIViewController
 {
@@ -14,9 +14,11 @@ final class LicensesViewController: UIViewController
     
     @IBOutlet private var textView: UITextView!
     
+    #if !os(tvOS)
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
+    #endif
     
     override func viewWillAppear(_ animated: Bool)
     {

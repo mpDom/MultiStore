@@ -6,6 +6,7 @@
 //  Copyright © 2020 Riley Testut. All rights reserved.
 //
 
+#if !os(tvOS)
 import Intents
 
 extension INInteraction
@@ -19,3 +20,4 @@ extension INInteraction
         return interaction
     }
 }
+#endif

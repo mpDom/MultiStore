@@ -11,7 +11,6 @@
 
 import UIKit
 
-import AltStoreCore
 import AltSign
 
 class AccountsViewController: UITableViewController
@@ -64,7 +63,7 @@ class AccountsViewController: UITableViewController
                 switch result
                 {
                 case .success: self.reloadAccounts()
-                case .failure(OperationError.cancelled): break
+                case .failure(let error) where error is CancellationError: break
                 case .failure(let error): self.present(error: error)
                 }
             }

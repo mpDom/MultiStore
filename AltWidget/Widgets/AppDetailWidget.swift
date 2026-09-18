@@ -8,11 +8,14 @@
 
 import WidgetKit
 import SwiftUI
-import AltStoreCore
 
 struct AppDetailWidget: Widget
 {
     private let kind: String = "AppDetail"
+    
+    init() {
+        debugLog("[AppDetailWidget] Initialized widget kind: AppDetail")
+    }
     
     public var body: some WidgetConfiguration {
         // On iOS 16+ use AppIntentConfiguration — it correctly supports
@@ -129,17 +132,18 @@ private struct AppDetailWidgetView: View
             }
             else
             {
-                VStack {
-                    // Put conditional inside VStack, or else an empty view will be returned
-                    // if isPlaceholder == false, which messes up layout.
-                    if !isPlaceholder
-                    {
-                        Text("App Not Found")
-                            .font(.system(.body, design: .rounded))
-                            .fontWeight(.semibold)
-                            .foregroundColor(Color.white.opacity(0.4))
-                    }
+                VStack(spacing: 4) {
+                    Text("Open SideStore")
+                        .font(.system(.subheadline, design: .rounded))
+                        .fontWeight(.semibold)
+                        .foregroundColor(Color.white.opacity(0.8))
+                    Text("Launch app to update widget")
+                        .font(.system(.caption2, design: .rounded))
+                        .foregroundColor(Color.white.opacity(0.5))
+                        .multilineTextAlignment(.center)
                 }
+                .padding()
+                .unredacted()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
@@ -149,11 +153,15 @@ private struct AppDetailWidgetView: View
                 tintColor: apps.first?.tintColor
             )
         )
+        .onAppear {
+            debugLog("[AppDetailWidgetView] onAppear: isPlaceholder=\(isPlaceholder), appsCount=\(apps.count), firstApp=\(apps.first?.name ?? "none"), date=\(date)")
+        }
     }
 
     func backgroundView(icon: UIImage? = nil, tintColor: UIColor? = nil) -> some View
     {
-        let icon = icon ?? UIImage(named: "SideStore")!
+        let defaultIcon = UIImage(named: "SideStore") ?? UIImage(systemName: "app.fill")!
+        let icon = icon ?? defaultIcon
         let tintColor = tintColor ?? .gray
         
         let imageHeight = 60 as CGFloat
@@ -171,7 +179,7 @@ private struct AppDetailWidgetView: View
             height: icon.size.height * scalingFactor
         )
             
-        let resizedIcon = icon.resizing(to: resizedSize)!
+        let resizedIcon = icon.resizing(to: resizedSize) ?? icon
         
         return ZStack(alignment: .topTrailing) {
             // Blurred Image
@@ -208,7 +216,8 @@ private struct AppIconView: View
     let imageHeight: CGFloat
 
     var body: some View {
-        Image(uiImage: icon ?? UIImage())
+        let image = icon ?? UIImage(named: "SideStore") ?? UIImage(systemName: "app.fill")!
+        Image(uiImage: image)
             .resizable()
             .aspectRatio(CGSize(width: 1, height: 1), contentMode: .fit)
             .frame(height: imageHeight)
@@ -224,11 +233,11 @@ private struct AppIconView: View
 } timeline: {
     let expiredDate = Date().addingTimeInterval(1 * 60 * 60 * 24 * 7)
     let (altstore, _, _, longAltStore, _, _) = AppSnapshot.makePreviewSnapshots()
-    AppsEntry<Any>(date: Date(), apps: [altstore])
-    AppsEntry<Any>(date: Date(), apps: [longAltStore])
+    AppsEntry<Void>(date: Date(), apps: [altstore])
+    AppsEntry<Void>(date: Date(), apps: [longAltStore])
     
-    AppsEntry<Any>(date: expiredDate, apps: [altstore])
+    AppsEntry<Void>(date: expiredDate, apps: [altstore])
     
-    AppsEntry<Any>(date: Date(), apps: [])
-    AppsEntry<Any>(date: Date(), apps: [], isPlaceholder: true)
+    AppsEntry<Void>(date: Date(), apps: [])
+    AppsEntry<Void>(date: Date(), apps: [], isPlaceholder: true)
 }

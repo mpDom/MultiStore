@@ -25,6 +25,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     fileprivate static let operationDidFinishNotification = Notification.Name("io.sidestore.BackupOperationFinished")
     
     fileprivate static let operationResultKey = "result"
+    fileprivate static let skipNonCopyableKey = "skipNonCopyable"
     
     private var currentBackupReturnURL: URL?
     
@@ -41,17 +42,28 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return false }
         guard let command = components.host?.lowercased() else { return false }
         
+        if let verboseValue = components.queryItems?.first(where: { $0.name == "verbose" })?.value {
+            let isVerbose = (verboseValue.lowercased() == "true" || verboseValue == "1")
+            ConsoleLog.setVerbose(isVerbose)
+        }
+        
+        let skipNonCopyable: Bool = {
+            guard let value = components.queryItems?.first(where: { $0.name == "skipNonCopyable" })?.value else { return false }
+            return value.lowercased() == "true" || value == "1"
+        }()
+        let userInfo: [String: Any] = [AppDelegate.skipNonCopyableKey: skipNonCopyable]
+        
         switch command {
         case "backup":
             guard let returnString = components.queryItems?.first(where: { $0.name == "returnURL" })?.value, let returnURL = URL(string: returnString) else { return false }
             self.currentBackupReturnURL = returnURL
-            NotificationCenter.default.post(name: AppDelegate.startBackupNotification, object: nil)
+            NotificationCenter.default.post(name: AppDelegate.startBackupNotification, object: nil, userInfo: userInfo)
             return true
             
         case "restore":
             guard let returnString = components.queryItems?.first(where: { $0.name == "returnURL" })?.value, let returnURL = URL(string: returnString) else { return false }
             self.currentBackupReturnURL = returnURL
-            NotificationCenter.default.post(name: AppDelegate.startRestoreNotification, object: nil)
+            NotificationCenter.default.post(name: AppDelegate.startRestoreNotification, object: nil, userInfo: userInfo)
             return true
             
         default:
@@ -95,10 +107,57 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         
         guard let responseURL = components.url else { return }
         
+        guard let scheme = responseURL.scheme, scheme.hasPrefix("sidestore") else {
+            if let logger = try? ConsoleLog.getConsoleLog() {
+                debugLog(logger, "[SideBackup]: Error: responseURL scheme '\(responseURL.scheme ?? "nil")' does not start with 'sidestore'. Aborting launch.")
+            }
+            return
+        }
+        
+        guard let bundleID = Bundle.main.bundleIdentifier else {
+            if let logger = try? ConsoleLog.getConsoleLog() {
+                debugLog(logger, "[SideBackup]: Error: Bundle.main.bundleIdentifier is nil. Aborting launch.")
+            }
+            return
+        }
+        
+        let queryItems = components.queryItems?.reduce(into: [String: String]()) { $0[$1.name] = $1.value } ?? [:]
+        
+        let targetSideStoreBundleID: String
+        if let queryTargetBundleID = queryItems["targetBundleID"] {
+            targetSideStoreBundleID = queryTargetBundleID
+        } else if scheme.hasPrefix("sidestore-") {
+            targetSideStoreBundleID = String(scheme.dropFirst("sidestore-".count))
+        } else {
+            targetSideStoreBundleID = bundleID.hasSuffix(".SideBackup") 
+                    ? (bundleID as NSString).deletingPathExtension 
+                    : bundleID
+        }
+        
         Task { @MainActor in
-            // Response to the caller/parent app is posted here (url is provided by caller in incoming query params)
-            UIApplication.shared.open(responseURL, options: [:]) { (success) in
-                debugLog("[SideBackup]: Sent response to app with success: \(success)")
+            let logger = try? ConsoleLog.getConsoleLog()
+            if let logger = logger {
+                debugLog(logger, "[SideBackup]: Attempting to open target SideStore app '\(targetSideStoreBundleID)' via LSApplicationWorkspace with return URL: \(responseURL.absoluteString)")
+            }
+            
+            let success = await withCheckedContinuation { continuation in
+                SideBackupAppLauncher.openApplication(withBundleIdentifier: targetSideStoreBundleID, url: responseURL) { success, error in
+                    continuation.resume(returning: success)
+                }
+            }
+            
+            if let logger = logger {
+                debugLog(logger, "[SideBackup]: LSApplicationWorkspace launch completed with success: \(success)")
+            }
+            
+            if !success {
+                if let logger = logger {
+                    debugLog(logger, "[SideBackup]: LSApplicationWorkspace launch failed. Falling back to UIApplication.shared.open...")
+                }
+                let fallbackSuccess = await UIApplication.shared.open(responseURL, options: [:])
+                if let logger = logger {
+                    debugLog(logger, "[SideBackup]: Fallback UIApplication.shared.open success: \(fallbackSuccess)")
+                }
             }
         }
     }
@@ -112,26 +171,41 @@ enum BackupOperation {
 @MainActor
 class AppState: ObservableObject {
     @Published var currentOperation: BackupOperation? = nil
+    @Published var bootCheckError: Error? = nil
+    @Published var progressFraction: Double = 0.0
+    @Published var progressText: String = ""
     
     private var cancellables = Set<AnyCancellable>()
+    private let byteFormatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.allowedUnits = [.useMB, .useGB, .useKB]
+        formatter.countStyle = .file
+        return formatter
+    }()
     
     init() {
+        if let error = ConsoleLog.bootCheckError {
+            NSLog("[SideBackup] Boot Check ERROR: %@", error.localizedDescription)
+            self.bootCheckError = error
+        }
         NotificationCenter.default.publisher(for: AppDelegate.startBackupNotification)
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
+            .sink { [weak self] notification in
                 guard let self = self else { return }
+                let skipNonCopyable = notification.userInfo?[AppDelegate.skipNonCopyableKey] as? Bool ?? false
                 Task {
-                    await self.backup()
+                    await self.backup(skipNonCopyable: skipNonCopyable)
                 }
             }
             .store(in: &cancellables)
             
         NotificationCenter.default.publisher(for: AppDelegate.startRestoreNotification)
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
+            .sink { [weak self] notification in
                 guard let self = self else { return }
+                let skipNonCopyable = notification.userInfo?[AppDelegate.skipNonCopyableKey] as? Bool ?? false
                 Task {
-                    await self.restore()
+                    await self.restore(skipNonCopyable: skipNonCopyable)
                 }
             }
             .store(in: &cancellables)
@@ -139,22 +213,45 @@ class AppState: ObservableObject {
         NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                // Reset UI once we've left app (but not before).
-                // TODO: @mahee96: This doesn't account cases where backup is too long and user switched to other apps
-                //                 Now the user has lost his progress since current operation was cancelled due to switch between FG and BG
-                //                 if this just the reset for enum such that UI stops showing progress circle, then this is fine!
                 self?.currentOperation = nil
+                self?.progressFraction = 0.0
+                self?.progressText = ""
             }
             .store(in: &cancellables)
     }
     
-    private func backup() async {
+    private func updateProgress(copied: Int64, total: Int64) {
+        if total > 0 {
+            self.progressFraction = Double(copied) / Double(total)
+            let copiedStr = self.byteFormatter.string(fromByteCount: copied)
+            let totalStr = self.byteFormatter.string(fromByteCount: total)
+            let percent = Int(self.progressFraction * 100)
+            self.progressText = "\(copiedStr) / \(totalStr) (\(percent)%)"
+        } else {
+            self.progressFraction = 0.0
+            self.progressText = "Processing…"
+        }
+    }
+
+    private func backup(skipNonCopyable: Bool = false) async {
+        if let error = self.bootCheckError ?? ConsoleLog.bootCheckError {
+            let appName = Bundle.main.appName ?? NSLocalizedString("App", comment: "")
+            let title = String(format: NSLocalizedString("%@ could not be backed up.", comment: ""), appName)
+            self.process(.failure(error), errorTitle: title)
+            return
+        }
         self.currentOperation = .backup
+        self.progressFraction = 0.0
+        self.progressText = "Calculating size…"
         
         let appName = Bundle.main.appName ?? NSLocalizedString("App", comment: "")
         
         do {
-            try await BackupEngine.shared.performBackup()
+            try await BackupEngine.shared.performBackup(skipNonCopyable: skipNonCopyable) { [weak self] copied, total in
+                Task { @MainActor in
+                    self?.updateProgress(copied: copied, total: total)
+                }
+            }
             self.process(.success(()), errorTitle: "")
         } catch {
             let title = String(format: NSLocalizedString("%@ could not be backed up.", comment: ""), appName)
@@ -162,13 +259,25 @@ class AppState: ObservableObject {
         }
     }
     
-    private func restore() async {
+    private func restore(skipNonCopyable: Bool = false) async {
+        if let error = self.bootCheckError ?? ConsoleLog.bootCheckError {
+            let appName = Bundle.main.appName ?? NSLocalizedString("App", comment: "")
+            let title = String(format: NSLocalizedString("%@ could not be restored.", comment: ""), appName)
+            self.process(.failure(error), errorTitle: title)
+            return
+        }
         self.currentOperation = .restore
+        self.progressFraction = 0.0
+        self.progressText = "Calculating size…"
         
         let appName = Bundle.main.appName ?? NSLocalizedString("App", comment: "")
         
         do {
-            try await BackupEngine.shared.restoreBackup()
+            try await BackupEngine.shared.restoreBackup(skipNonCopyable: skipNonCopyable) { [weak self] copied, total in
+                Task { @MainActor in
+                    self?.updateProgress(copied: copied, total: total)
+                }
+            }
             self.process(.success(()), errorTitle: "")
         } catch {
             let title = String(format: NSLocalizedString("%@ could not be restored.", comment: ""), appName)
@@ -177,6 +286,9 @@ class AppState: ObservableObject {
     }
     
     private func process(_ result: Result<Void, Error>, errorTitle: String) {
+        if case .failure(let error) = result {
+            self.bootCheckError = error
+        }
         NotificationCenter.default.post(
             name: AppDelegate.operationDidFinishNotification,
             object: nil,

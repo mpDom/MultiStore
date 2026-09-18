@@ -6,9 +6,8 @@
 //  Copyright © 2020 Riley Testut. All rights reserved.
 //
 
-import UIKit
+@preconcurrency import UIKit
 import CoreData
-import AltStoreCore
 import Nuke
 
 @objc(SourcesFooterView)
@@ -45,8 +44,10 @@ final class SourcesViewController: UICollectionViewController
         super.viewDidLoad()
         
         // Ensure large titles
+        #if !os(tvOS)
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .automatic
+        #endif
 
         // Set title
         navigationItem.title = "Sources"
@@ -139,9 +140,12 @@ private extension SourcesViewController
     func makeLayout() -> UICollectionViewCompositionalLayout
     {
         var configuration = UICollectionLayoutListConfiguration(appearance: .grouped)
+        #if !os(tvOS)
         configuration.showsSeparators = false
+        #endif
         configuration.backgroundColor = .clear
         
+        #if !os(tvOS)
         configuration.trailingSwipeActionsConfigurationProvider = { [weak self] indexPath in
             guard let self else { return UISwipeActionsConfiguration(actions: []) }
             
@@ -179,6 +183,7 @@ private extension SourcesViewController
             
             return config
         }
+        #endif
         
         let layout = UICollectionViewCompositionalLayout.list(using: configuration)
         return layout
@@ -218,13 +223,16 @@ private extension SourcesViewController
             let numberOfApps = source.apps.filter { StoreApp.visibleAppsPredicate.evaluate(with: $0) }.count
             
             UIView.performWithoutAnimation {
+                cell.bannerView.button.style = .custom
+                
+                let contentWidth: CGFloat
                 if let error = source.error
                 {
                     let image = UIImage(systemName: "exclamationmark")?.withTintColor(.white, renderingMode: .alwaysOriginal)
-                    
                     cell.bannerView.button.setImage(image, for: .normal)
                     cell.bannerView.button.setTitle(nil, for: .normal)
                     cell.bannerView.button.tintColor = .systemYellow.withAlphaComponent(0.75)
+                    contentWidth = image?.size.width ?? 7.0
                     
                     let action = UIAction(identifier: .showError) { _ in
                         self.present(error)
@@ -234,9 +242,13 @@ private extension SourcesViewController
                 }
                 else
                 {
+                    let text = numberOfApps.description
                     cell.bannerView.button.setImage(nil, for: .normal)
-                    cell.bannerView.button.setTitle(numberOfApps.description, for: .normal)
+                    cell.bannerView.button.setTitle(text, for: .normal)
                     cell.bannerView.button.tintColor = .white.withAlphaComponent(0.2)
+                    
+                    let font = UIFont.boldSystemFont(ofSize: 14)
+                    contentWidth = (text as NSString).size(withAttributes: [.font: font]).width
                     
                     let action = UIAction(identifier: .showDetails) { _ in
                         self.showSourceDetails(for: source)
@@ -244,6 +256,12 @@ private extension SourcesViewController
                     cell.bannerView.button.addAction(action, for: .primaryActionTriggered)
                     cell.bannerView.button.removeAction(identifiedBy: .showError, for: .primaryActionTriggered)
                 }
+                
+                var config = cell.bannerView.button.configuration ?? UIButton.Configuration.plain()
+                config.cornerStyle = .capsule
+                let horizontalPadding = max(0, (31.0 - contentWidth) / 2.0)
+                config.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: horizontalPadding, bottom: 0, trailing: horizontalPadding)
+                cell.bannerView.button.configuration = config
             }
             
             let dateText: String
@@ -260,16 +278,8 @@ private extension SourcesViewController
             cell.bannerView.subtitleLabel.text = text
             cell.bannerView.subtitleLabel.numberOfLines = 1
             
-            let numberOfAppsText: String
-            if #available(iOS 15, *)
-            {
-                let attributedOutput = AttributedString(localized: "^[\(numberOfApps) app](inflect: true)")
-                numberOfAppsText = String(attributedOutput.characters)
-            }
-            else
-            {
-                numberOfAppsText = ""
-            }
+            let attributedOutput = AttributedString(localized: "^[\(numberOfApps) app](inflect: true)")
+            let numberOfAppsText = String(attributedOutput.characters)
             
             let accessibilityLabel = source.name + "\n" + text + ".\n" + numberOfAppsText
             cell.bannerView.accessibilityLabel = accessibilityLabel
@@ -290,10 +300,8 @@ private extension SourcesViewController
         }
         dataSource.prefetchHandler = { (source, indexPath, completionHandler) in
             guard let imageURL = source.effectiveIconURL else { return nil }
-            return RSTAsyncBlockOperation() { (operation) in
+            Task.detached(priority: .background) {
                 ImagePipeline.shared.loadImage(with: imageURL, progress: nil) { result in
-                    guard !operation.isCancelled else { return operation.finish() }
-                    
                     switch result
                     {
                     case .success(let response): completionHandler(response.image, nil)
@@ -301,6 +309,7 @@ private extension SourcesViewController
                     }
                 }
             }
+            return nil
         }
         dataSource.prefetchCompletionHandler = { (cell, image, indexPath, error) in
             let cell = cell as! AppBannerCollectionViewCell
@@ -335,55 +344,41 @@ private extension SourcesViewController
 {
     func handleAddSourceDeepLink()
     {
-        guard let url = self.deepLinkSourceURL, self.view.window != nil else { return }
-        
-        // Only handle deep link once.
-        self.deepLinkSourceURL = nil
-        
-        self.navigationItem.leftBarButtonItem?.isIndicatingActivity = true
-        
-        func finish(_ result: Result<Void, Error>)
-        {
-            DispatchQueue.main.async {
-                switch result
-                {
-                case .success: break
-                case .failure(OperationError.cancelled): break
-                    
-                case .failure(var error as SourceError):
-                    let title = String(format: NSLocalizedString("“%@” could not be added to SideStore.", comment: ""), error.$source.name)
-                    error.errorTitle = title
-                    self.present(error)
-                    
-                case .failure(let error as NSError):
-                    self.present(error.withLocalizedTitle(NSLocalizedString("Unable to Add Source", comment: "")))
-                }
-                
-                self.navigationItem.leftBarButtonItem?.isIndicatingActivity = false
-            }
-        }
-        
-        AppManager.shared.fetchSource(sourceURL: url) { (result) in
-            do
+        Task {
+            guard let url = self.deepLinkSourceURL, self.view.window != nil else { return }
+            
+            // Only handle deep link once.
+            self.deepLinkSourceURL = nil
+            
+            self.navigationItem.leftBarButtonItem?.isIndicatingActivity = true
+            
+            func finish(_ result: Result<Void, Error>)
             {
-                // Use @Managed before calling perform() to keep
-                // strong reference to source.managedObjectContext.
-                @Managed var source = try result.get()
-                                
-                #if !BETA
-                guard let trustedSourceIDs = UserDefaults.shared.trustedSourceIDs, trustedSourceIDs.contains(source.identifier) else { throw SourceError(code: .unsupported, source: source) }
-                #endif
-                
                 DispatchQueue.main.async {
-                    self.showSourceDetails(for: source)
+                    switch result
+                    {
+                    case .success: break
+                    case .failure(let error) where error is CancellationError: break
+                        
+                    case .failure(var error as SourceError):
+                        let title = String(format: NSLocalizedString("“%@” could not be added to SideStore.", comment: ""), error.$source.name)
+                        error.errorTitle = title
+                        self.present(error)
+                        
+                    case .failure(let error as NSError):
+                        self.present(error.withLocalizedTitle(NSLocalizedString("Unable to Add Source", comment: "")))
+                    }
+                    
+                    self.navigationItem.leftBarButtonItem?.isIndicatingActivity = false
                 }
-                
-                finish(.success(()))
             }
-            catch
-            {
-                finish(.failure(error))
+            
+            let backgroundContext = DatabaseManager.shared.persistentContainer.newBackgroundContext()
+            let source = try await AppManager.shared.fetchSource(sourceURL: url, managedObjectContext: backgroundContext)
+            await MainActor.run {
+                showSourceDetails(for: source)
             }
+            finish(.success(()))
         }
     }
 
@@ -511,54 +506,3 @@ extension SourcesViewController: NSFetchedResultsControllerDelegate
     }
 }
 
-@available(iOS 17, *)
-#Preview(traits: .portrait) {
-    DatabaseManager.shared.startForPreview()
-    
-    let storyboard = UIStoryboard(name: "Sources", bundle: nil)
-    let sourcesViewController = storyboard.instantiateInitialViewController()!
-    
-    let context = DatabaseManager.shared.persistentContainer.newBackgroundContext()
-    context.performAndWait {
-        _ = Source.make(name: "OatmealDome's AltStore Source",
-                        groupID: "me.oatmealdome.altstore",
-                        sourceURL: URL(string: "https://altstore.oatmealdome.me")!,
-                        context: context)
-        
-        _ = Source.make(name: "UTM Repository",
-                        groupID: "com.utmapp.repos.UTM",
-                        sourceURL: URL(string: "https://alt.getutm.app")!,
-                        context: context)
-        
-        _ = Source.make(name: "Flyinghead",
-                        groupID: "com.flyinghead.source",
-                        sourceURL: URL(string: "https://flyinghead.github.io/flycast-builds/altstore.json")!,
-                        context: context)
-        
-        _ = Source.make(name: "Provenance",
-                        groupID: "org.provenance-emu.AltStore",
-                        sourceURL: URL(string: "https://provenance-emu.com/apps.json")!,
-                        context: context)
-        
-        _ = Source.make(name: "PojavLauncher Repository",
-                        groupID: "dev.crystall1ne.repos.PojavLauncher",
-                        sourceURL: URL(string: "http://alt.crystall1ne.dev")!,
-                        context: context)
-        
-        try! context.save()
-    }
-    
-    AppManager.shared.fetchSources { result in
-        do
-        {
-            let (_, context) = try result.get()
-            try context.save()
-        }
-        catch
-        {
-            debugLog("Preview failed to fetch sources: \(error)")
-        }
-    }
-    
-    return sourcesViewController
-}

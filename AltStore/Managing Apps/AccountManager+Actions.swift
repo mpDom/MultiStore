@@ -11,7 +11,6 @@ import Foundation
 import CoreData
 import UIKit
 
-import AltStoreCore
 import AltSign
 
 extension AccountManager
@@ -21,20 +20,18 @@ extension AccountManager
     /// newly added account becomes the default account for new installs. Returns the resolved
     /// `Account` (a view-context object) on success.
     @discardableResult
-    func addAccount(presentingViewController: UIViewController, completionHandler: @escaping (Result<Account, Error>) -> Void) -> AuthenticationOperation
+    func addAccount(presentingViewController: UIViewController, completionHandler: @escaping (Result<Account, Error>) -> Void) -> Task<Void, Never>
     {
-        let context = AuthenticatedOperationContext()
+        let dbBackgroundContext = DatabaseManager.shared.persistentContainer.newBackgroundContext()
+        let context = AppManager.shared.makeAuthenticatedContext(presentingViewController: presentingViewController, dbBackgroundContext: dbBackgroundContext)
         context.ignoresCachedCredentials = true
 
-        return AppManager.shared.authenticate(presentingViewController: presentingViewController, context: context, skipDeviceRegistration: false) { result in
-            switch result
+        return Task {
+            do
             {
-            case .failure(let error):
-                completionHandler(.failure(error))
-
-            case .success(let (team, _, _)):
-                let accountID = team.account.identifier
-                DispatchQueue.main.async {
+                let result = try await AuthManager.shared.authenticate(context: context, skipDeviceRegistration: false)
+                let accountID = result.team.account.identifier
+                await MainActor.run {
                     if let account = self.account(accountID, in: DatabaseManager.shared.viewContext)
                     {
                         completionHandler(.success(account))
@@ -45,6 +42,10 @@ extension AccountManager
                     }
                 }
             }
+            catch
+            {
+                completionHandler(.failure(error))
+            }
         }
     }
 
@@ -54,8 +55,9 @@ extension AccountManager
     {
         let apps = self.appsForAccount(accountID, in: DatabaseManager.shared.viewContext)
 
-        let group = RefreshGroup()
-        group.context.accountID = accountID
+        let context = AppManager.shared.makeAuthenticatedContext(presentingViewController: presentingViewController)
+        context.accountID = accountID
+        let group = RefreshGroup(context: context)
         group.completionHandler = { results in
             completionHandler(.success(results))
         }

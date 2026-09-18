@@ -7,9 +7,8 @@
 //
 
 import SwiftUI
-import AltStoreCore
 
-@available(iOS 16, *)
+@available(iOS 16, tvOS 16, *)
 extension AppPermissionsCard
 {
     private struct TransitionKey: Hashable
@@ -33,7 +32,7 @@ extension AppPermissionsCard
     }
 }
 
-@available(iOS 16, *)
+@available(iOS 16, tvOS 16, *)
 struct AppPermissionsCard<Permission: AppPermissionProtocol>: View
 {
     let title: LocalizedStringKey
@@ -220,7 +219,7 @@ struct AppPermissionsCard<Permission: AppPermissionProtocol>: View
     }
 }
 
-@available(iOS 16, *)
+@available(iOS 16, tvOS 16, *)
 private extension AppPermissionsCard
 {
     func show(_ permission: Permission)
@@ -238,7 +237,7 @@ private extension AppPermissionsCard
     }
 }
 
-@available(iOS 16, *)
+@available(iOS 16, tvOS 16, *)
 struct AppPermissionsCard_Previews: PreviewProvider
 {
     static var previews: some View {

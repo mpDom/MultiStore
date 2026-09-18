@@ -7,15 +7,13 @@
 //
 
 import SwiftUI
-import AltSign
-
-extension ALTApplication: Identifiable {}
+@preconcurrency import AltSign
 
 struct AppExtensionView: View {
     var extensions: Set<ALTApplication>
     @State var selection: [ALTApplication] = []
         
-    var completion: (_ selection: [ALTApplication]) -> Any?
+    var completion: (_ selection: [ALTApplication]) -> Void
     
     var body: some View {
         NavigationView {
@@ -35,7 +33,7 @@ struct AppExtensionView: View {
             }
             .navigationTitle("App Extensions")
             .onDisappear {
-                _ = completion(selection)
+                completion(selection)
             }
         }
     }
@@ -62,20 +60,23 @@ struct MultipleSelectionRow: View {
 class AppExtensionViewHostingController: UIHostingController<AppExtensionView> {
     
     
-    var completion: Optional<(_ selection: [ALTApplication]) -> Any?> = nil
+    var completion: Optional<(_ selection: [ALTApplication]) -> Void>?
     
-    required init(extensions: Set<ALTApplication>, completion: @escaping (_ selection: [ALTApplication]) -> Any?) {
+    required init(extensions: Set<ALTApplication>, completion: @escaping (_ selection: [ALTApplication]) -> Void) {
         self.completion = completion
         super.init(rootView: AppExtensionView(extensions: extensions, completion: completion))
     }
     
-    @MainActor required dynamic init?(coder aDecoder: NSCoder) {
+    @MainActor
+    required dynamic init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
 }
 
+#if !os(tvOS)
 extension AppExtensionViewHostingController: UIPopoverPresentationControllerDelegate {
     func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
         return .none
     }
 }
+#endif

@@ -6,7 +6,7 @@
 //  Copyright © 2021 Riley Testut. All rights reserved.
 //
 
-import UIKit
+@preconcurrency import UIKit
 import AudioToolbox
 import CoreHaptics
 

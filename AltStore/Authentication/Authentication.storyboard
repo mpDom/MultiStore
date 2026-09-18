@@ -431,10 +431,10 @@
             </objects>
             <point key="canvasLocation" x="1353" y="736"/>
         </scene>
-        <!--Refresh SideStore-->
+        <!--Resign SideStore-->
         <scene sceneID="9Vh-dM-OqX">
             <objects>
-                <viewController storyboardIdentifier="refreshAltStoreViewController" id="aoK-yE-UVT" customClass="RefreshAltStoreViewController" customModule="SideStore" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="resignAltStoreViewController" id="aoK-yE-UVT" customClass="ResignAltStoreViewController" customModule="SideStore" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" id="R83-kV-365">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -453,17 +453,17 @@
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="19"/>
                                         <color key="tintColor" name="SettingsHighlighted"/>
-                                        <state key="normal" title="Refresh Now">
+                                        <state key="normal" title="Resign Now">
                                             <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </state>
                                         <connections>
-                                            <action selector="refreshAltStore:" destination="aoK-yE-UVT" eventType="primaryActionTriggered" id="WQu-9b-Zgg"/>
+                                            <action selector="resignAltStore:" destination="aoK-yE-UVT" eventType="primaryActionTriggered" id="WQu-9b-Zgg"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qua-VA-asJ">
                                         <rect key="frame" x="0.0" y="59" width="343" height="30"/>
                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                        <state key="normal" title="Refresh Later">
+                                        <state key="normal" title="Resign Later">
                                             <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </state>
                                         <connections>
@@ -485,7 +485,7 @@
                             <constraint firstItem="tDQ-ao-1Jg" firstAttribute="leading" secondItem="R83-kV-365" secondAttribute="leadingMargin" id="zEt-Xr-kJx"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Refresh SideStore" largeTitleDisplayMode="always" id="5nk-NR-jtV"/>
+                    <navigationItem key="navigationItem" title="Resign SideStore" largeTitleDisplayMode="always" id="5nk-NR-jtV"/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
                         <outlet property="placeholderView" destination="fpO-Bf-gFY" id="q7d-au-d94"/>

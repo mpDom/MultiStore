@@ -1,12 +1,11 @@
 //
 //  ErrorProcessing.swift
-//  AltStore
+//  SideStore
 //
 //  Created by Magesh K on 20/01/25.
 //  Copyright © 2025 SideStore. All rights reserved.
 //
 
-import AltStoreCore
 
 class ErrorProcessing {
     
@@ -29,6 +28,23 @@ class ErrorProcessing {
         self.recur = recur
     }
     
+    private func userFriendlyDescription(for error: NSError) -> String {
+        let domain = error.domain
+        if domain == "kcerrordomain" || domain == NSOSStatusErrorDomain {
+            switch error.code {
+            case -25300: // errSecItemNotFound
+                return NSLocalizedString("Keychain item not found.", comment: "")
+            case -25299: // errSecDuplicateItem
+                return NSLocalizedString("Keychain item already exists.", comment: "")
+            case -25293: // errSecAuthFailed
+                return NSLocalizedString("Keychain authentication failed.", comment: "")
+            default:
+                return NSLocalizedString("Keychain security error.", comment: "")
+            }
+        }
+        return error.localizedDescription
+    }
+
     private func processError(_ error: NSError, ignoreTitle: Bool = false, getMoreErrors: (_ error: NSError)->String) -> String{
         // if unique was requested and if this error is duplicate, ignore processing it
         let serializedError = "\(error)"
@@ -42,7 +58,7 @@ class ErrorProcessing {
         switch (info){
             case .localizedDescription:
                 title = !ignoreTitle ? (error.localizedTitle.map{$0+"\n"} ?? "") : ""
-                desc = error.localizedDescription
+                desc = userFriendlyDescription(for: error)
             case .fullError:
                 desc = serializedError
         }

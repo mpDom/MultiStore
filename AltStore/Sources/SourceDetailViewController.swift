@@ -6,10 +6,8 @@
 //  Copyright © 2023 Riley Testut. All rights reserved.
 //
 
-import UIKit
-import SafariServices
+@preconcurrency import UIKit
 import Combine
-import AltStoreCore
 
 import Nuke
 
@@ -143,10 +141,12 @@ class SourceDetailViewController: HeaderContentViewController<SourceHeaderView, 
             // Users can't remove default AltStore source, so hide buttons.
             self.navigationBarButton.isHidden = true
             
+            #if !os(tvOS)
             if #available(iOS 16, *)
             {
                 self.navigationItem.rightBarButtonItem?.isHidden = true
             }
+            #endif
         }
         else
         {
@@ -162,20 +162,24 @@ class SourceDetailViewController: HeaderContentViewController<SourceHeaderView, 
                 self.navigationBarButton.tintColor = self.source.effectiveTintColor?.adjustedForDisplay ?? .altPrimary
                 self.navigationBarButton.isHidden = false
                 
+                #if !os(tvOS)
                 if #available(iOS 16, *)
                 {
                     self.navigationItem.rightBarButtonItem?.isHidden = false
                 }
+                #endif
                 
             case false?:
                 title = NSLocalizedString("ADD", comment: "")
                 self.navigationBarButton.tintColor = self.source.effectiveTintColor?.adjustedForDisplay ?? .altPrimary
                 self.navigationBarButton.isHidden = false
                 
+                #if !os(tvOS)
                 if #available(iOS 16, *)
                 {
                     self.navigationItem.rightBarButtonItem?.isHidden = false
                 }
+                #endif
                 
             case nil:
                 title = ""
@@ -194,7 +198,7 @@ class SourceDetailViewController: HeaderContentViewController<SourceHeaderView, 
                 self.navigationItem.rightBarButtonItem = barButtonItem
             }
             
-            let currentSizeWidth = max(77, self.navigationBarButton.intrinsicContentSize.width)
+            let currentSizeWidth = max(PillButton.minimumSize.width, self.navigationBarButton.intrinsicContentSize.width)
             let targetWidth = currentSizeWidth + 2
             if let existingConstraint = self.widthConstraint
             {
@@ -202,7 +206,8 @@ class SourceDetailViewController: HeaderContentViewController<SourceHeaderView, 
             }
             else
             {
-                let constraint = self.navigationBarButton.widthAnchor.constraint(equalToConstant: targetWidth)
+                let constraint = self.navigationBarButton.widthAnchor.constraint(greaterThanOrEqualToConstant: targetWidth)
+                constraint.priority = .required
                 constraint.isActive = true
                 self.widthConstraint = constraint
             }
@@ -217,12 +222,12 @@ class SourceDetailViewController: HeaderContentViewController<SourceHeaderView, 
     {
         self.viewModel.isAddingSource = true
         
-        Task { /* @MainActor in */ // Already on MainActor, even though this function wasn't called from async context.
+        Task {
             var errorTitle = NSLocalizedString("Unable to Add Source", comment: "")
             
             do
             {
-                let isAdded = try await self.source.isAdded
+                let isAdded = try await self.source.isAdded()
                 if isAdded
                 {
                     errorTitle = NSLocalizedString("Unable to Remove Source", comment: "")
@@ -248,10 +253,7 @@ class SourceDetailViewController: HeaderContentViewController<SourceHeaderView, 
     @objc private func showWebsite()
     {
         guard let websiteURL = self.source.websiteURL else { return }
-        
-        let safariViewController = SFSafariViewController(url: websiteURL)
-        safariViewController.preferredControlTintColor = self.source.effectiveTintColor ?? .altPrimary
-        self.present(safariViewController, animated: true, completion: nil)
+        self.openWebURL(websiteURL, preferredTintColor: self.source.effectiveTintColor ?? .altPrimary)
     }
 }
 

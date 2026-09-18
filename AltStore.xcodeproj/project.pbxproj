@@ -3,32 +3,20 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 73;
+	objectVersion = 71;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A8037A0E2F54664300097AF1 /* libem_proxy_swift.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A8037A0D2F54664300097AF1 /* libem_proxy_swift.a */; };
-		A8038ABC2F54684D00097AF1 /* libem_proxy_swift.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A8037A0D2F54664300097AF1 /* libem_proxy_swift.a */; };
-		A8038AC82F54687A00097AF1 /* libem_proxy_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A8EB8CBC2F5453CD0094BC01 /* libem_proxy_static.a */; };
-		A803924B2F552F4C00097AF1 /* Minimuxer in Frameworks */ = {isa = PBXBuildFile; productRef = A803924A2F552F4C00097AF1 /* Minimuxer */; };
-		A82067C42D03E0DE00645C0D /* SemanticVersion in Frameworks */ = {isa = PBXBuildFile; productRef = A82067C32D03E0DE00645C0D /* SemanticVersion */; };
-		A823609F2FF0B46900AD4DAF /* AltSign-Static in Frameworks */ = {isa = PBXBuildFile; productRef = A823609E2FF0B46900AD4DAF /* AltSign-Static */; };
-		A82360A12FF0B47500AD4DAF /* AltSign-Static in Frameworks */ = {isa = PBXBuildFile; productRef = A82360A02FF0B47500AD4DAF /* AltSign-Static */; };
-		A823DC542FF0D82100AD4DAF /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = A823DC532FF0D82100AD4DAF /* OpenSSL */; };
-		A82526E72FF0E1C000FB2EDD /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = A82526E62FF0E1C000FB2EDD /* OpenSSL */; };
-		A83FE3672EC90482005ACE9A /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = A83FE3662EC90482005ACE9A /* Starscream */; };
-		A83FE3772EC905E3005ACE9A /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = A83FE3762EC905E3005ACE9A /* KeychainAccess */; };
-		A844287D2FE791EA003CC103 /* Minimuxer in Frameworks */ = {isa = PBXBuildFile; productRef = A844287C2FE791EA003CC103 /* Minimuxer */; };
-		A8B646012D70C23E00125819 /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A8B646002D70C23E00125819 /* MarkdownKit */; };
-		A8C2260E2EC9039A00047C0D /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = A8C2260D2EC9039A00047C0D /* Nuke */; };
-		A8EB89C22F5448B20094BC01 /* em_proxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8BD2F652F543FD40045335F /* em_proxy.swift */; };
-		A8EB89CE2F5451B50094BC01 /* SemanticVersion in Frameworks */ = {isa = PBXBuildFile; productRef = A8EB89CD2F5451B50094BC01 /* SemanticVersion */; };
-		A8EB89D02F5451C20094BC01 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = A8EB89CF2F5451C20094BC01 /* KeychainAccess */; };
-		BF580498246A3D19008AE704 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF580497246A3D19008AE704 /* UIKit.framework */; };
-		BF66EE852501AE50007EE018 /* AltStoreCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF66EE7E2501AE50007EE018 /* AltStoreCore.framework */; };
-		BF66EE862501AE50007EE018 /* AltStoreCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BF66EE7E2501AE50007EE018 /* AltStoreCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		BF989177250AABF4002ACF50 /* AltWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BF989167250AABF3002ACF50 /* AltWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		BFF615A82510042B00484D3B /* AltStoreCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF66EE7E2501AE50007EE018 /* AltStoreCore.framework */; };
+		A84596F62F7DC4C90000B8CD /* SideStore.conf in Resources */ = {isa = PBXBuildFile; fileRef = A84596F52F7DC4C90000B8CD /* SideStore.conf */; };
+		A87939D3303A89CA004D9227 /* Minimuxer in Frameworks */ = {isa = PBXBuildFile; productRef = A87939D2303A89CA004D9227 /* Minimuxer */; };
+		A8C37029302DA7F30010213A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = A8C37028302DA7F30010213A /* MarkdownKit */; };
+		A8C3702C302DA80D0010213A /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = A8C3702B302DA80D0010213A /* KeychainAccess */; };
+		A8C3702F302DA82A0010213A /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = A8C3702E302DA82A0010213A /* Nuke */; };
+		A8C37035302DA84D0010213A /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = A8C37034302DA84D0010213A /* Starscream */; };
+		A8C37039302DA8D90010213A /* SemanticVersion in Frameworks */ = {isa = PBXBuildFile; productRef = A8C37038302DA8D90010213A /* SemanticVersion */; };
+		A8F5E9AF30422E3600DBD7E1 /* AltSign in Frameworks */ = {isa = PBXBuildFile; productRef = A8F5E9AE30422E3600DBD7E1 /* AltSign */; };
+		A8F5E9B130422E3F00DBD7E1 /* AnisetteKit in Frameworks */ = {isa = PBXBuildFile; productRef = A8F5E9B030422E3F00DBD7E1 /* AnisetteKit */; };
+		BF989177250AABF4002ACF50 /* AltWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BF989167250AABF3002ACF50 /* AltWidgetExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,40 +27,12 @@
 			remoteGlobalIDString = BF58047A246A28F7008AE704;
 			remoteInfo = SideBackup;
 		};
-		A8038AC92F54689900097AF1 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A8BD2FBD2F5440300045335F /* em_proxy.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = CA60C44C93D7A30E3695DD59;
-			remoteInfo = "em_proxy-staticlib";
-		};
-		A8EB8CBB2F5453CD0094BC01 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A8BD2FBD2F5440300045335F /* em_proxy.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = CA60C44C93D7916DE57E6EBD;
-			remoteInfo = "em_proxy-staticlib";
-		};
-		BF66EE832501AE50007EE018 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BFD247622284B9A500981D42 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BF66EE7D2501AE50007EE018;
-			remoteInfo = AltStoreCore;
-		};
 		BF989175250AABF4002ACF50 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BFD247622284B9A500981D42 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = BF989166250AABF3002ACF50;
 			remoteInfo = AltWidgetExtension;
-		};
-		BFF615AA2510042B00484D3B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BFD247622284B9A500981D42 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BF66EE7D2501AE50007EE018;
-			remoteInfo = AltStoreCore;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -83,7 +43,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				BF66EE862501AE50007EE018 /* AltStoreCore.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -102,62 +61,20 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		A8036EA72F54642D00097AF1 /* libimobiledevice.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libimobiledevice.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		A8037A0D2F54664300097AF1 /* libem_proxy_swift.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libem_proxy_swift.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A84596F12F7DC4C90000B8CD /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		A84596F22F7DC4C90000B8CD /* .gitmodules */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitmodules; sourceTree = "<group>"; };
 		A84596F32F7DC4C90000B8CD /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A84596F42F7DC4C90000B8CD /* trustedapps.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = trustedapps.json; sourceTree = "<group>"; };
-		A8BD20292F543FD40045335F /* client_privatekey */ = {isa = PBXFileReference; lastKnownFileType = text; path = client_privatekey; sourceTree = "<group>"; };
-		A8BD202A2F543FD40045335F /* client_publickey */ = {isa = PBXFileReference; lastKnownFileType = text; path = client_publickey; sourceTree = "<group>"; };
-		A8BD202B2F543FD40045335F /* emp.conf */ = {isa = PBXFileReference; lastKnownFileType = text; path = emp.conf; sourceTree = "<group>"; };
-		A8BD202C2F543FD40045335F /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		A8BD202D2F543FD40045335F /* server_privatekey */ = {isa = PBXFileReference; lastKnownFileType = text; path = server_privatekey; sourceTree = "<group>"; };
-		A8BD202E2F543FD40045335F /* server_publickey_client */ = {isa = PBXFileReference; lastKnownFileType = text; path = server_publickey_client; sourceTree = "<group>"; };
-		A8BD20302F543FD40045335F /* lib.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = lib.rs; sourceTree = "<group>"; };
-		A8BD20312F543FD40045335F /* run.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = run.rs; sourceTree = "<group>"; };
-		A8BD2F602F543FD40045335F /* build.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = build.rs; sourceTree = "<group>"; };
-		A8BD2F622F543FD40045335F /* Cargo.toml */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cargo.toml; sourceTree = "<group>"; };
-		A8BD2F632F543FD40045335F /* cbindgen.toml */ = {isa = PBXFileReference; lastKnownFileType = text; path = cbindgen.toml; sourceTree = "<group>"; };
-		A8BD2F642F543FD40045335F /* em_proxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = em_proxy.h; sourceTree = "<group>"; };
-		A8BD2F652F543FD40045335F /* em_proxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = em_proxy.swift; sourceTree = "<group>"; };
-		A8BD2F662F543FD40045335F /* libem_proxy-ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libem_proxy-ios.a"; sourceTree = "<group>"; };
-		A8BD2F672F543FD40045335F /* libem_proxy-sim.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libem_proxy-sim.a"; sourceTree = "<group>"; };
-		A8BD2F692F543FD40045335F /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		A8BD2F6A2F543FD40045335F /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
-		A8BD2F6B2F543FD40045335F /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		A8BD2FBD2F5440300045335F /* em_proxy.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = em_proxy.xcodeproj; sourceTree = "<group>"; };
-		A8BD2FBE2F5440300045335F /* fetch-prebuilt.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "fetch-prebuilt.sh"; sourceTree = "<group>"; };
+		A84596F52F7DC4C90000B8CD /* SideStore.conf */ = {isa = PBXFileReference; lastKnownFileType = text; path = SideStore.conf; sourceTree = "<group>"; };
 		B3C39606284F4C8400DA9E2F /* CodeSigning.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CodeSigning.xcconfig; sourceTree = "<group>"; };
 		B3C39607284F4C8400DA9E2F /* Build.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Build.xcconfig; sourceTree = "<group>"; };
 		B3C39608284F4C8400DA9E2F /* CodeSigning.xcconfig.sample */ = {isa = PBXFileReference; lastKnownFileType = text; path = CodeSigning.xcconfig.sample; sourceTree = "<group>"; };
 		BF58047B246A28F7008AE704 /* SideBackup.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SideBackup.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		BF580497246A3D19008AE704 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		BF66EE7E2501AE50007EE018 /* AltStoreCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AltStoreCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF989167250AABF3002ACF50 /* AltWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AltWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFD2476A2284B9A500981D42 /* SideStore.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SideStore.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A8EEC0BF2F4AF7FB00F2436D /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			publicHeaders = (
-				AltStoreCore.h,
-			);
-			target = BF66EE7D2501AE50007EE018 /* AltStoreCore */;
-		};
-		A8EEC36A2F4B0D8700F2436D /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Errors/ALTLocalizedError.swift,
-				Errors/UserInfoValue.swift,
-				"Extensions/ALTApplication+AltStoreApp.swift",
-			);
-			target = BFD247692284B9A500981D42 /* SideStore */;
-		};
 		A8EEC36B2F4B0D8700F2436D /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -188,6 +105,83 @@
 				Info.plist,
 				Resources/ReleaseEntitlements.plist,
 			);
+			platformFiltersByRelativePath = {
+				Authentication/Authentication.storyboard = (
+					ios,
+				);
+				Authentication/tvOS/Authentication.storyboard = (
+					tvos,
+				);
+				Components/AppBannerView.xib = (
+					ios,
+				);
+				Components/tvOS/AppBannerView.xib = (
+					tvos,
+				);
+				Core/Resources/RSTPlaceholderView.xib = (
+					ios,
+				);
+				Core/Resources/tvOS/RSTPlaceholderView.xib = (
+					tvos,
+				);
+				"My Apps/InstalledAppsCollectionHeaderView.xib" = (
+					ios,
+				);
+				"My Apps/UpdateCollectionViewCell.xib" = (
+					ios,
+				);
+				"My Apps/tvOS/InstalledAppsCollectionHeaderView.xib" = (
+					tvos,
+				);
+				"My Apps/tvOS/UpdateCollectionViewCell.xib" = (
+					tvos,
+				);
+				News/NewsCollectionViewCell.xib = (
+					ios,
+				);
+				News/tvOS/NewsCollectionViewCell.xib = (
+					tvos,
+				);
+				Settings/AboutPatreonHeaderView.xib = (
+					ios,
+				);
+				Settings/Settings.storyboard = (
+					ios,
+				);
+				Settings/SettingsHeaderFooterView.xib = (
+					ios,
+				);
+				Settings/tvOS/AboutPatreonHeaderView.xib = (
+					tvos,
+				);
+				Settings/tvOS/Settings.storyboard = (
+					tvos,
+				);
+				Settings/tvOS/SettingsHeaderFooterView.xib = (
+					tvos,
+				);
+				Sources/Components/SourceHeaderView.xib = (
+					ios,
+				);
+				Sources/Components/tvOS/SourceHeaderView.xib = (
+					tvos,
+				);
+				Sources/Sources.storyboard = (
+					ios,
+				);
+				Sources/tvOS/Sources.storyboard = (
+					tvos,
+				);
+				iOS/LaunchScreen.storyboard = (
+					ios,
+				);
+				iOS/Main.storyboard = (
+					ios,
+				);
+				tvOS/Main.storyboard = (
+					tvos,
+				);
+			};
 			target = BFD247692284B9A500981D42 /* SideStore */;
 		};
 		A8EEC8CD2F4B146B00F2436D /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
@@ -200,24 +194,12 @@
 		A8EECF492F4B195000F2436D /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				EMProxyWrapper.swift,
-				MinimuxerWrapper.swift,
-				OperationLogging.swift,
-				SideStoreLogging.swift,
-				URLHandler.swift,
-				Utils/common/BuildInfo.swift,
-				Utils/common/DateTimeUtil.swift,
-				Utils/common/FileOutputStream.swift,
-				Utils/common/OutputStream.swift,
-				Utils/datastructures/LinkedHashMap.swift,
-				Utils/datastructures/TreeMap.swift,
-				Utils/dignostics/database/CoreDataHelper.swift,
-				Utils/dignostics/errors/ErrorProcessing.swift,
-				Utils/dignostics/operations/OperationsLoggingControl.swift,
-				Utils/importexport/ImportExport.swift,
-				Utils/iostreams/ConsoleLog.swift,
-				Utils/iostreams/ConsoleLogger.swift,
-				Views/UIKit/CollapsingMarkdownView.swift,
+				Tests/UITests/UITests.swift,
+				Tests/UITests/UITestsLaunchTests.swift,
+				Tests/UnitTests/datastructures/DataStructuresTests.swift,
+				Tests/UnitTests/datastructures/LinkedHashMapTests.swift,
+				Tests/UnitTests/datastructures/TreeMapTests.swift,
+				"Utils/misc/xcmapping-diff-reporter/xcmapping-diff.py",
 			);
 			target = BFD247692284B9A500981D42 /* SideStore */;
 		};
@@ -226,64 +208,28 @@
 			membershipExceptions = (
 				Utils/datastructures/SingletonGenericMap.swift,
 				Utils/pagination/PaginationDataHolder.swift,
+				Widget/WidgetData/WidgetDataManager.swift,
+				Widget/WidgetData/WidgetLogManager.swift,
+				Widget/WidgetData/WidgetModels.swift,
 			);
 			target = BF989166250AABF3002ACF50 /* AltWidgetExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		174F75012F8B4F4900A53376 /* PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = BFD247682284B9A500981D42 /* Resources */;
-			membershipExceptions = (
-				Intents/ViewApp.intentdefinition,
-			);
-		};
-		A8EEC8CC2F4B146B00F2436D /* PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = BFD247682284B9A500981D42 /* Resources */;
-			membershipExceptions = (
-				AltStoreFree.entitlements,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A8EEC0502F4AF7FB00F2436D /* AltStoreCore */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (174F75012F8B4F4900A53376 /* PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet */, A8EEC0BF2F4AF7FB00F2436D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = AltStoreCore; sourceTree = "<group>"; };
-		A8EEC3482F4B0D8600F2436D /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (A8EEC36A2F4B0D8700F2436D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, A8EEC36B2F4B0D8700F2436D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
+		A8EEC3482F4B0D8600F2436D /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (A8EEC36B2F4B0D8700F2436D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
 		A8EEC3B92F4B0EFC00F2436D /* AltWidget */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (A8EEC3CA2F4B0EFC00F2436D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = AltWidget; sourceTree = "<group>"; };
 		A8EEC3D92F4B0FC800F2436D /* SideBackup */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (A8EEC3E22F4B0FC800F2436D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = SideBackup; sourceTree = "<group>"; };
 		A8EEC71D2F4B10D900F2436D /* xcconfigs */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = xcconfigs; sourceTree = "<group>"; };
-		A8EEC8412F4B146A00F2436D /* AltStore */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (A8EEC8CB2F4B146B00F2436D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, A8EEC8CC2F4B146B00F2436D /* PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet */, A8EEC8CD2F4B146B00F2436D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = AltStore; sourceTree = "<group>"; };
+		A8EEC8412F4B146A00F2436D /* AltStore */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (A8EEC8CB2F4B146B00F2436D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, A8EEC8CD2F4B146B00F2436D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = AltStore; sourceTree = "<group>"; };
 		A8EECF2A2F4B195000F2436D /* SideStore */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (A8EECF492F4B195000F2436D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, A8EECF4A2F4B195000F2436D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = SideStore; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		A85A51432F4B4532002E2E11 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A8038AC82F54687A00097AF1 /* libem_proxy_static.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		BF580478246A28F7008AE704 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A82526E72FF0E1C000FB2EDD /* OpenSSL in Frameworks */,
-				BF580498246A3D19008AE704 /* UIKit.framework in Frameworks */,
-				A823609F2FF0B46900AD4DAF /* AltSign-Static in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		BF66EE7B2501AE50007EE018 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A82360A12FF0B47500AD4DAF /* AltSign-Static in Frameworks */,
-				A82067C42D03E0DE00645C0D /* SemanticVersion in Frameworks */,
-				A83FE3772EC905E3005ACE9A /* KeychainAccess in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,7 +237,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BFF615A82510042B00484D3B /* AltStoreCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -299,94 +244,29 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A8B646012D70C23E00125819 /* MarkdownKit in Frameworks */,
-				A8037A0E2F54664300097AF1 /* libem_proxy_swift.a in Frameworks */,
-				A8038ABC2F54684D00097AF1 /* libem_proxy_swift.a in Frameworks */,
-				A8EB89D02F5451C20094BC01 /* KeychainAccess in Frameworks */,
-				A844287D2FE791EA003CC103 /* Minimuxer in Frameworks */,
-				A8C2260E2EC9039A00047C0D /* Nuke in Frameworks */,
-				A823DC542FF0D82100AD4DAF /* OpenSSL in Frameworks */,
-				A83FE3672EC90482005ACE9A /* Starscream in Frameworks */,
-				A8EB89CE2F5451B50094BC01 /* SemanticVersion in Frameworks */,
-				BF66EE852501AE50007EE018 /* AltStoreCore.framework in Frameworks */,
-				A803924B2F552F4C00097AF1 /* Minimuxer in Frameworks */,
+				A8F5E9B130422E3F00DBD7E1 /* AnisetteKit in Frameworks */,
+				A8F5E9AF30422E3600DBD7E1 /* AltSign in Frameworks */,
+				A8C37029302DA7F30010213A /* MarkdownKit in Frameworks */,
+				A8C3702C302DA80D0010213A /* KeychainAccess in Frameworks */,
+				A8C3702F302DA82A0010213A /* Nuke in Frameworks */,
+				A8C37035302DA84D0010213A /* Starscream in Frameworks */,
+				A8C37039302DA8D90010213A /* SemanticVersion in Frameworks */,
+				A87939D3303A89CA004D9227 /* Minimuxer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		A8BD1FD62F543F390045335F /* Dependencies */ = {
-			isa = PBXGroup;
-			children = (
-				A8BD2F6C2F543FD40045335F /* em_proxy */,
-			);
-			path = Dependencies;
-			sourceTree = "<group>";
-		};
-		A8BD202F2F543FD40045335F /* keys */ = {
-			isa = PBXGroup;
-			children = (
-				A8BD20292F543FD40045335F /* client_privatekey */,
-				A8BD202A2F543FD40045335F /* client_publickey */,
-				A8BD202B2F543FD40045335F /* emp.conf */,
-				A8BD202C2F543FD40045335F /* README.md */,
-				A8BD202D2F543FD40045335F /* server_privatekey */,
-				A8BD202E2F543FD40045335F /* server_publickey_client */,
-			);
-			path = keys;
-			sourceTree = "<group>";
-		};
-		A8BD20322F543FD40045335F /* src */ = {
-			isa = PBXGroup;
-			children = (
-				A8BD20302F543FD40045335F /* lib.rs */,
-				A8BD20312F543FD40045335F /* run.rs */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
-		A8BD2F6C2F543FD40045335F /* em_proxy */ = {
-			isa = PBXGroup;
-			children = (
-				A8BD202F2F543FD40045335F /* keys */,
-				A8BD20322F543FD40045335F /* src */,
-				A8BD2F602F543FD40045335F /* build.rs */,
-				A8BD2F622F543FD40045335F /* Cargo.toml */,
-				A8BD2F632F543FD40045335F /* cbindgen.toml */,
-				A8BD2F642F543FD40045335F /* em_proxy.h */,
-				A8BD2F652F543FD40045335F /* em_proxy.swift */,
-				A8BD2F662F543FD40045335F /* libem_proxy-ios.a */,
-				A8BD2F672F543FD40045335F /* libem_proxy-sim.a */,
-				A8BD2F692F543FD40045335F /* Makefile */,
-				A8BD2F6A2F543FD40045335F /* module.modulemap */,
-				A8BD2F6B2F543FD40045335F /* README.md */,
-				A8BD2FBD2F5440300045335F /* em_proxy.xcodeproj */,
-				A8BD2FBE2F5440300045335F /* fetch-prebuilt.sh */,
-			);
-			path = em_proxy;
-			sourceTree = "<group>";
-		};
-		A8EB8CB82F5453CD0094BC01 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				A8EB8CBC2F5453CD0094BC01 /* libem_proxy_static.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		BFD247612284B9A500981D42 = {
 			isa = PBXGroup;
 			children = (
 				A8EEC8412F4B146A00F2436D /* AltStore */,
-				A8EEC0502F4AF7FB00F2436D /* AltStoreCore */,
 				A8EEC3B92F4B0EFC00F2436D /* AltWidget */,
 				A8EEC3482F4B0D8600F2436D /* Shared */,
 				A8EECF2A2F4B195000F2436D /* SideStore */,
 				A8EEC3D92F4B0FC800F2436D /* SideBackup */,
 				A8EEC71D2F4B10D900F2436D /* xcconfigs */,
-				A8BD1FD62F543F390045335F /* Dependencies */,
-				BFD247852284BB3300981D42 /* Frameworks */,
 				BFD2476B2284B9A500981D42 /* Products */,
 				B3C39607284F4C8400DA9E2F /* Build.xcconfig */,
 				B3C39606284F4C8400DA9E2F /* CodeSigning.xcconfig */,
@@ -395,60 +275,23 @@
 				A84596F22F7DC4C90000B8CD /* .gitmodules */,
 				A84596F32F7DC4C90000B8CD /* README.md */,
 				A84596F42F7DC4C90000B8CD /* trustedapps.json */,
+				A84596F52F7DC4C90000B8CD /* SideStore.conf */,
 			);
 			sourceTree = "<group>";
 		};
 		BFD2476B2284B9A500981D42 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A8037A0D2F54664300097AF1 /* libem_proxy_swift.a */,
-				A8036EA72F54642D00097AF1 /* libimobiledevice.a */,
 				BFD2476A2284B9A500981D42 /* SideStore.app */,
 				BF58047B246A28F7008AE704 /* SideBackup.app */,
-				BF66EE7E2501AE50007EE018 /* AltStoreCore.framework */,
 				BF989167250AABF3002ACF50 /* AltWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		BFD247852284BB3300981D42 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				BF580497246A3D19008AE704 /* UIKit.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		BF66EE792501AE50007EE018 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
-		A85A51412F4B4532002E2E11 /* em_proxy-swift */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A85A51452F4B4532002E2E11 /* Build configuration list for PBXNativeTarget "em_proxy-swift" */;
-			buildPhases = (
-				A85A51422F4B4532002E2E11 /* Sources */,
-				A85A51432F4B4532002E2E11 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				A8038ACA2F54689900097AF1 /* PBXTargetDependency */,
-			);
-			name = "em_proxy-swift";
-			productName = minimuxer;
-			productReference = A8037A0D2F54664300097AF1 /* libem_proxy_swift.a */;
-			productType = "com.apple.product-type.library.static";
-		};
 		BF58047A246A28F7008AE704 /* SideBackup */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = BF58048E246A28F9008AE704 /* Build configuration list for PBXNativeTarget "SideBackup" */;
@@ -469,33 +312,6 @@
 			productReference = BF58047B246A28F7008AE704 /* SideBackup.app */;
 			productType = "com.apple.product-type.application";
 		};
-		BF66EE7D2501AE50007EE018 /* AltStoreCore */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = BF66EE892501AE50007EE018 /* Build configuration list for PBXNativeTarget "AltStoreCore" */;
-			buildPhases = (
-				BF66EE792501AE50007EE018 /* Headers */,
-				BF66EE7A2501AE50007EE018 /* Sources */,
-				BF66EE7B2501AE50007EE018 /* Frameworks */,
-				BF66EE7C2501AE50007EE018 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				A8EEC0502F4AF7FB00F2436D /* AltStoreCore */,
-				A8EEC3482F4B0D8600F2436D /* Shared */,
-			);
-			name = AltStoreCore;
-			packageProductDependencies = (
-				A82067C32D03E0DE00645C0D /* SemanticVersion */,
-				A83FE3762EC905E3005ACE9A /* KeychainAccess */,
-				A82360A02FF0B47500AD4DAF /* AltSign-Static */,
-			);
-			productName = AltStoreCore;
-			productReference = BF66EE7E2501AE50007EE018 /* AltStoreCore.framework */;
-			productType = "com.apple.product-type.framework";
-		};
 		BF989166250AABF3002ACF50 /* AltWidgetExtension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = BF989178250AABF4002ACF50 /* Build configuration list for PBXNativeTarget "AltWidgetExtension" */;
@@ -507,9 +323,9 @@
 			buildRules = (
 			);
 			dependencies = (
-				BFF615AB2510042B00484D3B /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
+				A8EEC3482F4B0D8600F2436D /* Shared */,
 				A8EEC3B92F4B0EFC00F2436D /* AltWidget */,
 			);
 			name = AltWidgetExtension;
@@ -521,7 +337,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BFD2477E2284B9A700981D42 /* Build configuration list for PBXNativeTarget "SideStore" */;
 			buildPhases = (
-				A8D768282F52F0D4002356C4 /* Build Minimuxer Rust Bridge */,
 				BFD247662284B9A500981D42 /* Sources */,
 				BFD247672284B9A500981D42 /* Frameworks */,
 				A8E00D3F2D0C9C6D000DD2C7 /* Build SideBackup.ipa */,
@@ -533,15 +348,23 @@
 			);
 			dependencies = (
 				0ED4AEC92E6DDB2A0039E2C0 /* PBXTargetDependency */,
-				BF66EE842501AE50007EE018 /* PBXTargetDependency */,
 				BF989176250AABF4002ACF50 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
+				A8EEC3482F4B0D8600F2436D /* Shared */,
 				A8EEC8412F4B146A00F2436D /* AltStore */,
+				A8EECF2A2F4B195000F2436D /* SideStore */,
 			);
 			name = SideStore;
 			packageProductDependencies = (
-				A823DC532FF0D82100AD4DAF /* OpenSSL */,
+				A8C37028302DA7F30010213A /* MarkdownKit */,
+				A8C3702B302DA80D0010213A /* KeychainAccess */,
+				A8C3702E302DA82A0010213A /* Nuke */,
+				A8C37034302DA84D0010213A /* Starscream */,
+				A8C37038302DA8D90010213A /* SemanticVersion */,
+				A87939D2303A89CA004D9227 /* Minimuxer */,
+				A8F5E9AE30422E3600DBD7E1 /* AltSign */,
+				A8F5E9B030422E3F00DBD7E1 /* AnisetteKit */,
 			);
 			productName = AltStore;
 			productReference = BFD2476A2284B9A500981D42 /* SideStore.app */;
@@ -553,15 +376,13 @@
 		BFD247622284B9A500981D42 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1620;
-				LastUpgradeCheck = 1020;
+				LastUpgradeCheck = 2660;
 				ORGANIZATIONNAME = SideStore;
 				TargetAttributes = {
 					BF58047A246A28F7008AE704 = {
 						CreatedOnToolsVersion = 11.4.1;
-					};
-					BF66EE7D2501AE50007EE018 = {
-						CreatedOnToolsVersion = 12.0;
 					};
 					BF989166250AABF3002ACF50 = {
 						CreatedOnToolsVersion = 12.0;
@@ -582,6 +403,7 @@
 				};
 			};
 			buildConfigurationList = BFD247652284B9A500981D42 /* Build configuration list for PBXProject "AltStore" */;
+			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -590,53 +412,27 @@
 			);
 			mainGroup = BFD247612284B9A500981D42;
 			packageReferences = (
-				A82067C22D03E0DE00645C0D /* XCRemoteSwiftPackageReference "SemanticVersion" */,
-				A8B645FD2D70C1AD00125819 /* XCRemoteSwiftPackageReference "MarkdownKit" */,
-				A8C2260C2EC9039A00047C0D /* XCRemoteSwiftPackageReference "Nuke" */,
-				A83FE3652EC90482005ACE9A /* XCRemoteSwiftPackageReference "Starscream" */,
-				A83FE36D2EC90512005ACE9A /* XCRemoteSwiftPackageReference "KeychainAccess" */,
-				A844287A2FE791BB003CC103 /* XCLocalSwiftPackageReference "Dependencies/AltSign" */,
-				A844287B2FE791CF003CC103 /* XCLocalSwiftPackageReference "Dependencies/minimuxer" */,
+				A8C37021302DA7A70010213A /* XCLocalSwiftPackageReference "Dependencies/AltSign" */,
+				A8C37027302DA7F30010213A /* XCRemoteSwiftPackageReference "MarkdownKit" */,
+				A8C3702A302DA80D0010213A /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				A8C3702D302DA82A0010213A /* XCRemoteSwiftPackageReference "Nuke" */,
+				A8C37033302DA84D0010213A /* XCRemoteSwiftPackageReference "Starscream" */,
+				A8C37037302DA8D90010213A /* XCRemoteSwiftPackageReference "SemanticVersion" */,
+				A87939D1303A89C9004D9227 /* XCLocalSwiftPackageReference "Dependencies/minimuxer" */,
 			);
-			preferredProjectObjectVersion = 50;
 			productRefGroup = BFD2476B2284B9A500981D42 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = A8EB8CB82F5453CD0094BC01 /* Products */;
-					ProjectRef = A8BD2FBD2F5440300045335F /* em_proxy.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				BFD247692284B9A500981D42 /* SideStore */,
-				BF66EE7D2501AE50007EE018 /* AltStoreCore */,
 				BF58047A246A28F7008AE704 /* SideBackup */,
 				BF989166250AABF3002ACF50 /* AltWidgetExtension */,
-				A85A51412F4B4532002E2E11 /* em_proxy-swift */,
 			);
 		};
 /* End PBXProject section */
 
-/* Begin PBXReferenceProxy section */
-		A8EB8CBC2F5453CD0094BC01 /* libem_proxy_static.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libem_proxy_static.a;
-			remoteRef = A8EB8CBB2F5453CD0094BC01 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
-
 /* Begin PBXResourcesBuildPhase section */
 		BF580479246A28F7008AE704 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		BF66EE7C2501AE50007EE018 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -654,32 +450,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A84596F62F7DC4C90000B8CD /* SideStore.conf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		A8D768282F52F0D4002356C4 /* Build Minimuxer Rust Bridge */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Build Minimuxer Rust Bridge";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "set -e\n\necho \"Building minimuxer…\"\n\ncd \"${PROJECT_DIR}/Dependencies/minimuxer\"\npwd\n\n#make build\n";
-		};
 		A8E00D3F2D0C9C6D000DD2C7 /* Build SideBackup.ipa */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -699,22 +479,7 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		A85A51422F4B4532002E2E11 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A8EB89C22F5448B20094BC01 /* em_proxy.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		BF580477246A28F7008AE704 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		BF66EE7A2501AE50007EE018 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -743,89 +508,15 @@
 			target = BF58047A246A28F7008AE704 /* SideBackup */;
 			targetProxy = 0ED4AEC82E6DDB2A0039E2C0 /* PBXContainerItemProxy */;
 		};
-		A8038ACA2F54689900097AF1 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "em_proxy-staticlib";
-			targetProxy = A8038AC92F54689900097AF1 /* PBXContainerItemProxy */;
-		};
-		BF66EE842501AE50007EE018 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BF66EE7D2501AE50007EE018 /* AltStoreCore */;
-			targetProxy = BF66EE832501AE50007EE018 /* PBXContainerItemProxy */;
-		};
 		BF989176250AABF4002ACF50 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = BF989166250AABF3002ACF50 /* AltWidgetExtension */;
 			targetProxy = BF989175250AABF4002ACF50 /* PBXContainerItemProxy */;
-		};
-		BFF615AB2510042B00484D3B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BF66EE7D2501AE50007EE018 /* AltStoreCore */;
-			targetProxy = BFF615AA2510042B00484D3B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		A85A51462F4B4532002E2E11 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
-				CODE_SIGN_STYLE = Automatic;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_WARN_DUPLICATE_LIBRARIES = YES;
-				LD_WARN_UNUSED_DYLIBS = YES;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Dependencies/em_proxy",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 11.5;
-				OTHER_LDFLAGS = (
-					"-ObjC",
-					"$(inherited)",
-				);
-				PRODUCT_MODULE_NAME = em_proxy;
-				PRODUCT_NAME = em_proxy_swift;
-				SKIP_INSTALL = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OBJC_BRIDGING_HEADER = Dependencies/em_proxy/em_proxy.h;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		A85A51472F4B4532002E2E11 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_WARN_DUPLICATE_LIBRARIES = YES;
-				LD_WARN_UNUSED_DYLIBS = YES;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Dependencies/em_proxy",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 11.5;
-				OTHER_LDFLAGS = (
-					"-ObjC",
-					"$(inherited)",
-				);
-				PRODUCT_MODULE_NAME = em_proxy;
-				PRODUCT_NAME = em_proxy_swift;
-				SKIP_INSTALL = NO;
-				SWIFT_OBJC_BRIDGING_HEADER = Dependencies/em_proxy/em_proxy.h;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 		BF58048C246A28F9008AE704 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = A8EEC71D2F4B10D900F2436D /* xcconfigs */;
@@ -849,8 +540,12 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "$(PRODUCT_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "SideBackup/SideBackup-Bridging-Header.h";
 				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Debug;
 		};
@@ -877,90 +572,12 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "$(PRODUCT_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "SideBackup/SideBackup-Bridging-Header.h";
 				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		BF66EE872501AE50007EE018 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = A8EEC71D2F4B10D900F2436D /* xcconfigs */;
-			baseConfigurationReferenceRelativePath = AltStoreCore.xcconfig;
-			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = "$(inherited)";
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = AltStoreCore/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				LD_WARN_DUPLICATE_LIBRARIES = YES;
-				LD_WARN_UNUSED_DYLIBS = YES;
-				LLVM_LTO = YES_THIN;
-				PRODUCT_BUNDLE_IDENTIFIER = "$(PRODUCT_BUNDLE_IDENTIFIER)";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		BF66EE882501AE50007EE018 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = A8EEC71D2F4B10D900F2436D /* xcconfigs */;
-			baseConfigurationReferenceRelativePath = AltStoreCore.xcconfig;
-			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = "$(inherited)";
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_OPTIMIZATION_LEVEL = fast;
-				INFOPLIST_FILE = AltStoreCore/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				LD_WARN_DUPLICATE_LIBRARIES = YES;
-				LD_WARN_UNUSED_DYLIBS = YES;
-				LLVM_LTO = YES_THIN;
-				PRODUCT_BUNDLE_IDENTIFIER = "$(PRODUCT_BUNDLE_IDENTIFIER)";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Release;
 		};
@@ -969,7 +586,6 @@
 			baseConfigurationReferenceAnchor = A8EEC71D2F4B10D900F2436D /* xcconfigs */;
 			baseConfigurationReferenceRelativePath = AltWidgetExtension.xcconfig;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
@@ -1006,7 +622,6 @@
 			baseConfigurationReferenceAnchor = A8EEC71D2F4B10D900F2436D /* xcconfigs */;
 			baseConfigurationReferenceRelativePath = AltWidgetExtension.xcconfig;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
@@ -1063,6 +678,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1076,6 +692,7 @@
 				EAGER_LINKING = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1100,6 +717,7 @@
 					"-Wno-module-import-in-extern-c",
 				);
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG BETA";
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = "debug-only";
@@ -1135,6 +753,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1148,6 +767,7 @@
 				EAGER_LINKING = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = fast;
@@ -1166,9 +786,10 @@
 					"-Wno-module-import-in-extern-c",
 				);
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG BETA";
-				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = BETA;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = "debug-only";
 				SWIFT_OPTIMIZATION_LEVEL = "-Osize";
 				SYSTEM_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies/AltSign/Dependencies\"";
@@ -1203,23 +824,25 @@
 				);
 				LD_WARN_DUPLICATE_LIBRARIES = YES;
 				LD_WARN_UNUSED_DYLIBS = YES;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Dependencies/minimuxer/Sources/RustBridge/lib",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				LLVM_LTO = YES_THIN;
 				MARKETING_VERSION = "$(inherited)";
-				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-Xlinker",
+					"-w",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "$(PRODUCT_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = "debug-only";
-				SWIFT_OBJC_BRIDGING_HEADER = "AltStore/AltStore-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Debug;
 		};
@@ -1250,53 +873,37 @@
 				);
 				LD_WARN_DUPLICATE_LIBRARIES = YES;
 				LD_WARN_UNUSED_DYLIBS = YES;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Dependencies/minimuxer/Sources/RustBridge/lib",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				LLVM_LTO = YES_THIN;
 				MARKETING_VERSION = "$(inherited)";
-				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-Xlinker",
+					"-w",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "$(PRODUCT_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				SWIFT_COMPILATION_MODE = singlefile;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = "debug-only";
-				SWIFT_OBJC_BRIDGING_HEADER = "AltStore/AltStore-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Osize";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A85A51452F4B4532002E2E11 /* Build configuration list for PBXNativeTarget "em_proxy-swift" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A85A51462F4B4532002E2E11 /* Debug */,
-				A85A51472F4B4532002E2E11 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		BF58048E246A28F9008AE704 /* Build configuration list for PBXNativeTarget "SideBackup" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BF58048C246A28F9008AE704 /* Debug */,
 				BF58048D246A28F9008AE704 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		BF66EE892501AE50007EE018 /* Build configuration list for PBXNativeTarget "AltStoreCore" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				BF66EE872501AE50007EE018 /* Debug */,
-				BF66EE882501AE50007EE018 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1331,42 +938,26 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		A844287A2FE791BB003CC103 /* XCLocalSwiftPackageReference "Dependencies/AltSign" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = Dependencies/AltSign;
-		};
-		A844287B2FE791CF003CC103 /* XCLocalSwiftPackageReference "Dependencies/minimuxer" */ = {
+		A87939D1303A89C9004D9227 /* XCLocalSwiftPackageReference "Dependencies/minimuxer" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Dependencies/minimuxer;
+		};
+		A8C37021302DA7A70010213A /* XCLocalSwiftPackageReference "Dependencies/AltSign" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Dependencies/AltSign;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		A80392492F552F4C00097AF1 /* XCRemoteSwiftPackageReference "minimuxer" */ = {
+		A8C37027302DA7F30010213A /* XCRemoteSwiftPackageReference "MarkdownKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SideStore/minimuxer";
-			requirement = {
-				branch = develop;
-				kind = branch;
-			};
-		};
-		A82067C22D03E0DE00645C0D /* XCRemoteSwiftPackageReference "SemanticVersion" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SwiftPackageIndex/SemanticVersion";
-			requirement = {
-				kind = exactVersion;
-				version = 0.4.0;
-			};
-		};
-		A83FE3652EC90482005ACE9A /* XCRemoteSwiftPackageReference "Starscream" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/daltoniam/Starscream";
+			repositoryURL = "https://github.com/bmoliveira/MarkdownKit.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.8;
+				minimumVersion = 1.7.3;
 			};
 		};
-		A83FE36D2EC90512005ACE9A /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+		A8C3702A302DA80D0010213A /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
 			requirement = {
@@ -1374,89 +965,71 @@
 				kind = branch;
 			};
 		};
-		A8B645FD2D70C1AD00125819 /* XCRemoteSwiftPackageReference "MarkdownKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/bmoliveira/MarkdownKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.7.1;
-			};
-		};
-		A8C2260C2EC9039A00047C0D /* XCRemoteSwiftPackageReference "Nuke" */ = {
+		A8C3702D302DA82A0010213A /* XCRemoteSwiftPackageReference "Nuke" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kean/Nuke";
 			requirement = {
-				kind = upToNextMinorVersion;
-				minimumVersion = 10.0.0;
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.0.1;
+			};
+		};
+		A8C37033302DA84D0010213A /* XCRemoteSwiftPackageReference "Starscream" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/daltoniam/Starscream";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.8;
+			};
+		};
+		A8C37037302DA8D90010213A /* XCRemoteSwiftPackageReference "SemanticVersion" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftPackageIndex/SemanticVersion";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		A803924A2F552F4C00097AF1 /* Minimuxer */ = {
+		A87939D2303A89CA004D9227 /* Minimuxer */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A80392492F552F4C00097AF1 /* XCRemoteSwiftPackageReference "minimuxer" */;
 			productName = Minimuxer;
 		};
-		A82067C32D03E0DE00645C0D /* SemanticVersion */ = {
+		A8C37028302DA7F30010213A /* MarkdownKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A82067C22D03E0DE00645C0D /* XCRemoteSwiftPackageReference "SemanticVersion" */;
-			productName = SemanticVersion;
-		};
-		A823609E2FF0B46900AD4DAF /* AltSign-Static */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A844287A2FE791BB003CC103 /* XCLocalSwiftPackageReference "Dependencies/AltSign" */;
-			productName = "AltSign-Static";
-		};
-		A82360A02FF0B47500AD4DAF /* AltSign-Static */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A844287A2FE791BB003CC103 /* XCLocalSwiftPackageReference "Dependencies/AltSign" */;
-			productName = "AltSign-Static";
-		};
-		A823DC532FF0D82100AD4DAF /* OpenSSL */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A844287A2FE791BB003CC103 /* XCLocalSwiftPackageReference "Dependencies/AltSign" */;
-			productName = OpenSSL;
-		};
-		A82526E62FF0E1C000FB2EDD /* OpenSSL */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A844287A2FE791BB003CC103 /* XCLocalSwiftPackageReference "Dependencies/AltSign" */;
-			productName = OpenSSL;
-		};
-		A83FE3662EC90482005ACE9A /* Starscream */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A83FE3652EC90482005ACE9A /* XCRemoteSwiftPackageReference "Starscream" */;
-			productName = Starscream;
-		};
-		A83FE3762EC905E3005ACE9A /* KeychainAccess */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A83FE36D2EC90512005ACE9A /* XCRemoteSwiftPackageReference "KeychainAccess" */;
-			productName = KeychainAccess;
-		};
-		A844287C2FE791EA003CC103 /* Minimuxer */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A844287B2FE791CF003CC103 /* XCLocalSwiftPackageReference "Dependencies/minimuxer" */;
-			productName = Minimuxer;
-		};
-		A8B646002D70C23E00125819 /* MarkdownKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A8B645FD2D70C1AD00125819 /* XCRemoteSwiftPackageReference "MarkdownKit" */;
+			package = A8C37027302DA7F30010213A /* XCRemoteSwiftPackageReference "MarkdownKit" */;
 			productName = MarkdownKit;
 		};
-		A8C2260D2EC9039A00047C0D /* Nuke */ = {
+		A8C3702B302DA80D0010213A /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A8C2260C2EC9039A00047C0D /* XCRemoteSwiftPackageReference "Nuke" */;
+			package = A8C3702A302DA80D0010213A /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+		A8C3702E302DA82A0010213A /* Nuke */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A8C3702D302DA82A0010213A /* XCRemoteSwiftPackageReference "Nuke" */;
 			productName = Nuke;
 		};
-		A8EB89CD2F5451B50094BC01 /* SemanticVersion */ = {
+		A8C37034302DA84D0010213A /* Starscream */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A82067C22D03E0DE00645C0D /* XCRemoteSwiftPackageReference "SemanticVersion" */;
+			package = A8C37033302DA84D0010213A /* XCRemoteSwiftPackageReference "Starscream" */;
+			productName = Starscream;
+		};
+		A8C37038302DA8D90010213A /* SemanticVersion */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A8C37037302DA8D90010213A /* XCRemoteSwiftPackageReference "SemanticVersion" */;
 			productName = SemanticVersion;
 		};
-		A8EB89CF2F5451C20094BC01 /* KeychainAccess */ = {
+		A8F5E9AE30422E3600DBD7E1 /* AltSign */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A83FE36D2EC90512005ACE9A /* XCRemoteSwiftPackageReference "KeychainAccess" */;
-			productName = KeychainAccess;
+			package = A8C37021302DA7A70010213A /* XCLocalSwiftPackageReference "Dependencies/AltSign" */;
+			productName = AltSign;
+		};
+		A8F5E9B030422E3F00DBD7E1 /* AnisetteKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A8C37021302DA7A70010213A /* XCLocalSwiftPackageReference "Dependencies/AltSign" */;
+			productName = AnisetteKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

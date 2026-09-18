@@ -6,8 +6,7 @@
 //  Copyright © 2023 Riley Testut. All rights reserved.
 //
 
-import UIKit
-import AltStoreCore
+@preconcurrency import UIKit
 
 import Nuke
 

@@ -6,8 +6,7 @@
 //  Copyright © 2019 Riley Testut. All rights reserved.
 //
 
-import UIKit
-import AltStoreCore
+@preconcurrency import UIKit
 
 extension TimeInterval
 {
@@ -43,6 +42,10 @@ class ToastView: RSTToastView
         }
         
         super.init(text: text, detailText: detailedText)
+        
+        self.backgroundColor = .altPrimary
+        self.textLabel.textColor = .white
+        self.detailTextLabel.textColor = .white
         
         self.isAccessibilityElement = true
         
@@ -104,7 +107,7 @@ class ToastView: RSTToastView
     
     override func show(in view: UIView, duration: TimeInterval)
     {
-        if opensErrorLog, #available(iOS 13.0, *), case let configuration = UIImage.SymbolConfiguration(font: self.textLabel.font),
+        if opensErrorLog, case let configuration = UIImage.SymbolConfiguration(font: self.textLabel.font),
            let icon = UIImage(systemName: "chevron.right.circle", withConfiguration: configuration) {
             let tintedIcon = icon.withTintColor(.white, renderingMode: .alwaysOriginal)
             let moreIconImageView = UIImageView(image: tintedIcon)
