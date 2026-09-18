@@ -375,7 +375,10 @@ public extension UserDefaults
             #keyPath(UserDefaults.menuAnisetteURL): "https://ani.sidestore.io",
             #keyPath(UserDefaults.isAnisetteOfflineMode): false,
             #keyPath(UserDefaults.disableAnisetteRotation): false,
-            #keyPath(UserDefaults.useOnDeviceAnisette): true,
+            // MultiStore: remote anisette by default. Upstream defaults to on-device ADI emulation,
+            // which fails with -45061 (Device not provisioned) on devices that never provisioned
+            // locally, and there is no automatic fallback; on-device stays available as an opt-in.
+            #keyPath(UserDefaults.useOnDeviceAnisette): false,
             #keyPath(UserDefaults.useLocalVPN): true,
             #keyPath(UserDefaults.enableEMPforWireguard): false,
             #keyPath(UserDefaults.skipNonCopyableBackupFiles): true,
