@@ -192,7 +192,7 @@ final class FetchAnisetteDataOperation: ResultOperation<ALTAnisetteData>, WebSoc
                 formattedJSON["locale"] = Locale.current.identifier
                 formattedJSON["timeZone"] = TimeZone.current.abbreviation()
             } else {
-                if let deviceDescription = json["X-MMe-Client-Info"] { formattedJSON["deviceDescription"] = deviceDescription }
+                if let deviceDescription = json["X-MMe-Client-Info"] { formattedJSON["deviceDescription"] = Self.sanitizedClientInfo(deviceDescription) }
                 if let localUserID = json["X-Apple-I-MD-LU"] { formattedJSON["localUserID"] = localUserID }
                 if let deviceUniqueIdentifier = json["X-Mme-Device-Id"] { formattedJSON["deviceUniqueIdentifier"] = deviceUniqueIdentifier }
                 
@@ -475,6 +475,18 @@ final class FetchAnisetteDataOperation: ResultOperation<ALTAnisetteData>, WebSoc
     
     // MARK: - V3: FETCHING
     
+    /// Since early September 2026 Apple's GrandSlam edge answers HTTP 503 (an HTML page, which
+    /// then fails plist parsing as NSCocoaErrorDomain 3840) to any request whose
+    /// X-MMe-Client-Info contains "com.apple.dt.Xcode". Public anisette servers still advertise
+    /// that identity, so rewrite it to the akd identity Apple accepts. Mirrors upstream
+    /// SideStore/AnisetteKit@ebab7b9 and the omnisette change in SideStore/apple-private-apis#27.
+    static func sanitizedClientInfo(_ clientInfo: String) -> String {
+        guard let range = clientInfo.range(of: #"com\.apple\.dt\.Xcode(/[^)>\s]*)?"#, options: .regularExpression) else {
+            return clientInfo
+        }
+        return clientInfo.replacingCharacters(in: range, with: "com.apple.akd/1.0")
+    }
+
     private func fetchClientInfo() async throws {
         if self.clientInfo != nil &&
            self.userAgent != nil &&
@@ -493,8 +505,11 @@ final class FetchAnisetteDataOperation: ResultOperation<ALTAnisetteData>, WebSoc
             if let clientInfo = json["client_info"] {
                 self.verboseLog("Server is V3")
                 
-                self.clientInfo = clientInfo
+                self.clientInfo = Self.sanitizedClientInfo(clientInfo)
                 self.userAgent = json["user_agent"]!
+                if self.clientInfo != clientInfo {
+                    self.verboseLog("Server Client-Info rewritten from: \(clientInfo)")
+                }
                 self.verboseLog("Client-Info: \(self.clientInfo!)")
                 self.verboseLog("User-Agent: \(self.userAgent!)")
                 
