@@ -115,9 +115,8 @@ public extension AccountManager
             installedApp.team = team
         }
 
-        // Re-signing is required to actually switch the signer.
-        installedApp.needsResign = true
-
+        // Re-signing is required to actually switch the signer; callers (changeSigningAccount)
+        // trigger it explicitly.
         return true
     }
 

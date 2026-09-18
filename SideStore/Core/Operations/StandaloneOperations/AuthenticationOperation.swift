@@ -94,6 +94,12 @@ final class AuthenticationOperation: BaseStandaloneOperation<AuthenticatedOperat
     /// (`context.accountID != nil`). Such flows must never touch the global `AuthManager` /
     /// `CertificateManager` state, which belongs to the default account.
     private var isTargetedAccountFlow: Bool { self.context.accountID != nil }
+
+    /// Multi-account: whether this flow may update the global `AuthManager` / `CertificateManager`
+    /// state. True for the untargeted flow and for a targeted flow of the *default* account (so a
+    /// refresh that provisions a new certificate for the default account keeps the global copy in
+    /// sync instead of leaving a stale certificate behind). Resolved once in `execute()`.
+    private var updatesGlobalState = true
     
     let skipDeviceRegistration: Bool
     let skipCertificateProvisioning: Bool
@@ -124,8 +130,17 @@ final class AuthenticationOperation: BaseStandaloneOperation<AuthenticatedOperat
         }
         try await super.executePreconditionCheck(parentProgress: parentProgress)
 
+        if let targetAccountID = self.context.accountID {
+            let defaultAccountID = await DatabaseManager.shared.persistentContainer.performBackgroundTask { context in
+                DatabaseManager.shared.activeAccount(in: context)?.identifier
+            }
+            self.updatesGlobalState = (targetAccountID == defaultAccountID)
+        }
+
         let authResult = try await TaskChainCoalescerWithProgress.shared.coalesce(
-            key: "apple_auth:\(self.context.accountID ?? "default")",
+            key: self.context.ignoresCachedCredentials
+                ? "apple_auth:new:\(ObjectIdentifier(self.context).hashValue)"
+                : "apple_auth:\(self.context.accountID ?? "default")",
             onProgress: { [weak self] progress in
                 self?.setProgress(progress)
             }
@@ -188,7 +203,7 @@ final class AuthenticationOperation: BaseStandaloneOperation<AuthenticatedOperat
             try await self.authenticationLoop()
         }
         self.context.session = session
-        if !self.isTargetedAccountFlow {
+        if self.updatesGlobalState {
             AuthManager.shared.session = session
         }
 
@@ -224,7 +239,7 @@ final class AuthenticationOperation: BaseStandaloneOperation<AuthenticatedOperat
                     let team = try await self.fetchTeam(for: account, session: session)
 
                     self.context.team = team
-                    if !self.isTargetedAccountFlow {
+                    if self.updatesGlobalState {
                         AuthManager.shared.team = team
                     }
 
@@ -237,7 +252,7 @@ final class AuthenticationOperation: BaseStandaloneOperation<AuthenticatedOperat
 
                 // 2. Resolve Certificate (Custom vs Developer Portal)
                 if !isCertificateResolved {
-                    let activeCert = self.storedSigningCertificate()
+                    let activeCert = self.storedSigningCertificate(for: team)
                     let isCustomCert = activeCert?.data.map { data in
                         let details = parseCertificate(derData: data)
                         return !details.subject.contains(team.identifier) && !details.issuer.contains(team.identifier)
@@ -249,7 +264,7 @@ final class AuthenticationOperation: BaseStandaloneOperation<AuthenticatedOperat
                         resolvedCertificate = activeCert
                     } else {
                         let certificate = try await self.fetchCertificate(for: team, session: session)
-                        if !self.isTargetedAccountFlow {
+                        if self.updatesGlobalState {
                             try CertificateManager.shared.setActiveCertificate(certificate)
                         }
                         self.persistSigningCertificate(certificate, accountID: self.context.accountID ?? team.account.identifier)
@@ -439,7 +454,19 @@ final class AuthenticationOperation: BaseStandaloneOperation<AuthenticatedOperat
                 if let certificate { self.persistSigningCertificate(certificate, accountID: resolvedAccountID) }
                 Keychain.shared.cache(session: session, certificate: certificate, team: team, forAccount: resolvedAccountID)
                 
-                if let signingCertificate = certificate, !self.skipCertificateProvisioning
+                // Multi-account: SideStore itself is signed by exactly one account. Validating its
+                // signature against any *other* account would always report a mismatch and push the
+                // user into the "Resign SideStore" flow (or hang a headless background refresh).
+                var sideStoreAccountID: String?
+                if let dbContext = self.context.dbBackgroundContext {
+                    sideStoreAccountID = await dbContext.perform {
+                        let predicate = NSPredicate(format: "%K == %@", #keyPath(InstalledApp.bundleIdentifier), StoreApp.altstoreAppID)
+                        return InstalledApp.first(satisfying: predicate, in: dbContext)?.resolvedSigningAccountID
+                    }
+                }
+                let signsSideStore = (sideStoreAccountID == nil) || (sideStoreAccountID == resolvedAccountID)
+
+                if let signingCertificate = certificate, !self.skipCertificateProvisioning, signsSideStore
                 {
                     let signer = ALTSigner(team: team, certificate: signingCertificate)
                     let didResign = await self.validateCodeSign(signer: signer, session: session)
@@ -617,7 +644,7 @@ private extension AuthenticationOperation {
         
         let mainBundleCertSerial = Bundle.main.object(forInfoDictionaryKey: Bundle.Info.certificateID) as? String
         
-        if let activeCert = self.storedSigningCertificate(),
+        if let activeCert = self.storedSigningCertificate(for: team),
            let certificate = portalCertificates.first(where: { $0.serialNumber == activeCert.serialNumber }) 
         {
             activeCert.machineIdentifier = certificate.machineIdentifier
@@ -817,15 +844,17 @@ private extension AuthenticationOperation {
     }
 
     /// The signing certificate previously stored for the account being authenticated: the
-    /// account's own slot for a targeted flow, the global active certificate otherwise.
-    func storedSigningCertificate() -> ALTCertificate? {
-        if let accountID = self.targetAccountID {
+    /// account's own slot for a targeted flow -- and for an "add account" sign-in, where the
+    /// global active certificate belongs to the *previous* account and must not be inherited --
+    /// the global active certificate otherwise.
+    func storedSigningCertificate(for team: ALTTeam? = nil) -> ALTCertificate? {
+        let accountID = self.targetAccountID ?? (self.context.ignoresCachedCredentials ? team?.account.identifier : nil)
+        if let accountID {
             let credentials = Keychain.shared.credentials(forAccount: accountID)
             guard let data = credentials.signingCertificate else { return nil }
             return try? CertificateManager.parse(data, password: credentials.signingCertificatePassword)
-        } else {
-            return CertificateManager.shared.activeCertificate?.certificate
         }
+        return CertificateManager.shared.activeCertificate?.certificate
     }
 
     /// Persist the login tokens obtained during interactive authentication of a targeted account.

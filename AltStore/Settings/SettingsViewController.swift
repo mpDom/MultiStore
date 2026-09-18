@@ -929,7 +929,7 @@ extension SettingsViewController
         }
         
         
-        if section == .account
+        if indexPath.section == Section.account.rawValue
         {
             // The account rows open the multi-account management screen — show a chevron so it's
             // clear they're tappable (add / remove / switch Apple accounts).

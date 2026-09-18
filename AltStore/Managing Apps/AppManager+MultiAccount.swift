@@ -81,7 +81,8 @@ extension AppManager
             {
                 let childContext = self.makeAuthenticatedContext(presentingViewController: presentingViewController)
                 childContext.accountID = partition.accountID
-                let childGroup = RefreshGroup(context: childContext, sharedContext: aggregateGroup.sharedContext)
+                // Each account gets its own SharedPipelineContext: its App-ID/App-Group cache is per team.
+                let childGroup = RefreshGroup(context: childContext)
 
                 // Forward the SideStore self-install callback (used for the background-refresh
                 // notification) up to the aggregate group.
